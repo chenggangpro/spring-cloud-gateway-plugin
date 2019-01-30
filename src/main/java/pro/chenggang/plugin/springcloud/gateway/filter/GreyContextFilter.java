@@ -64,8 +64,8 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
         //get contentType
         MediaType contentType = exchange.getRequest().getHeaders().getContentType();
         //get grey rules and grey operation type
-        LinkedHashMap<String, List<String>> rules = greyRule.getRules();
-        Set<String> ruleKeys = rules.keySet();
+        LinkedHashMap<String, List<String>> ruleMap = greyRule.getRuleMap();
+        Set<String> ruleKeys = ruleMap.keySet();
         GreyProperties.GreyRule.Operation operation = greyRule.getOperation();
         //get All request data (query params and form data params)
         MultiValueMap<String, String> allRequestData = gatewayContext.getAllRequestData();
@@ -104,10 +104,10 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
         boolean matched = false;
         switch (operation){
             case OR:
-                matched = validateGreyOrOperation(filteredRequestData,rules);
+                matched = validateGreyOrOperation(filteredRequestData,ruleMap);
                 break;
             case AND:
-                matched = validateGreyAndOperation(filteredRequestData,rules);
+                matched = validateGreyAndOperation(filteredRequestData,ruleMap);
                 break;
             default:
                 break;

@@ -1,0 +1,35 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    gateway:
+      grey:
+        greyRuleList:
+          - serviceId: privider1
+            version: 2.0.0
+            operation: OR
+            rules:
+              - key: key1
+                value:
+                  - value1
+                  - value2
+                  - value3
+              - key: key2
+                value:
+                  - value4
+                  - value5
+                  - value6
+          - serviceId: provider2
+            version: 2.0.0
+            operation: AND
+            rules:
+              - key: keya
+                value:
+                  - value1a
+                  - value2a
+                  - value3a
+              - key: keyb
+                value:
+                  - value4b
+                  - value5b
+                  - value6b

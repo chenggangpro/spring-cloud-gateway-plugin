@@ -21,8 +21,6 @@ import java.util.Map;
  */
 @Slf4j
 @ToString
-@Getter
-@Setter
 @ConfigurationProperties(GreyProperties.GREY_PROPERTIES_PREFIX)
 public class GreyProperties implements InitializingBean{
 
@@ -30,10 +28,13 @@ public class GreyProperties implements InitializingBean{
     /**
      * Grey Rule
      */
+    @Getter
+    @Setter
     private List<GreyRule> greyRuleList = Collections.emptyList();
     /**
      * Grey Rule Map
      */
+    @Getter
     private Map<String,GreyRule> greyRuleMap = Collections.emptyMap();
 
     @Override
@@ -61,14 +62,40 @@ public class GreyProperties implements InitializingBean{
     }
 
 
-    @Getter
-    @Setter
     @ToString
-    public static class GreyRule{
+    public static class GreyRule implements InitializingBean{
+        @Getter
+        @Setter
         private String serviceId;
+        @Getter
+        @Setter
         private String version;
+        @Getter
+        @Setter
         private Operation operation = Operation.OR;
-        private LinkedHashMap<String,List<String>> rules = new LinkedHashMap<>();
+        @Getter
+        @Setter
+        private List<Rule> rules = Collections.emptyList();
+        @Getter
+        private LinkedHashMap<String,List<String>> ruleMap = new LinkedHashMap<>();
+
+        @Override
+        public void afterPropertiesSet() {
+            if(rules.isEmpty()){
+               return;
+            }
+            for(Rule rule : rules){
+                ruleMap.put(rule.getKey(),rule.getValue());
+            }
+        }
+
+        @Getter
+        @Setter
+        @ToString
+        public static class Rule{
+            private String key;
+            private List<String> value;
+        }
 
         public enum Operation{
             /**
