@@ -15,8 +15,6 @@ import pro.chenggang.plugin.springcloud.gateway.response.JsonExceptionHandler;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.DefaultExceptionHandlerStrategyFactory;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.ExceptionHandlerStrategyFactory;
 import pro.chenggang.plugin.springcloud.gateway.response.strategy.ExceptionHandlerStrategy;
-import pro.chenggang.plugin.springcloud.gateway.response.strategy.NotFoundExceptionHandlerStrategy;
-import pro.chenggang.plugin.springcloud.gateway.response.strategy.ResponseStatusExceptionHandlerStrategy;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,25 +27,6 @@ import java.util.Map;
  */
 @Configuration
 public class GlobalExceptionJsonHandlerConfig {
-
-    /**
-     * NotFoundExceptionHandlerStrategy
-     * @return
-     */
-    @Bean
-    public ExceptionHandlerStrategy notFoundExceptionHandlerStrategy(){
-        return new NotFoundExceptionHandlerStrategy();
-    }
-
-
-    /**
-     * ResponseStatusExceptionHandlerStrategy
-     * @return
-     */
-    @Bean
-    public ExceptionHandlerStrategy responseStatusExceptionHandlerStrategy(){
-        return new ResponseStatusExceptionHandlerStrategy();
-    }
 
     /**
      * ExceptionHandlerStrategyFactory

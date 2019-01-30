@@ -43,14 +43,6 @@ public class DefaultExceptionHandlerStrategyFactory implements ExceptionHandlerS
         }
     }
 
-    /**
-     * Get Strategy Size
-     * @return
-     */
-    public int getStrategySize(){
-        return strategyContainer.size()+1;
-    }
-
     @Override
     public ExceptionHandlerStrategy getStrategy(Class clazz) {
         ExceptionHandlerStrategy strategy =  strategyContainer.get(clazz);
