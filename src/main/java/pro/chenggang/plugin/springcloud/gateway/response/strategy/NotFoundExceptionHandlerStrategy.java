@@ -2,6 +2,7 @@ package pro.chenggang.plugin.springcloud.gateway.response.strategy;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.http.HttpStatus;
 import pro.chenggang.plugin.springcloud.gateway.option.ResponseResult;
 import pro.chenggang.plugin.springcloud.gateway.option.SystemResponseInfo;
@@ -14,6 +15,11 @@ import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
  */
 @Slf4j
 public class NotFoundExceptionHandlerStrategy implements ExceptionHandlerStrategy{
+
+    @Override
+    public Class getHandleClass() {
+        return NotFoundException.class;
+    }
 
     @Override
     public ExceptionHandlerResult handleException(Throwable throwable) {

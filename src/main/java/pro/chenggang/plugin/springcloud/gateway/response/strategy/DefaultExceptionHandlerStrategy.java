@@ -16,6 +16,11 @@ import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
 public class DefaultExceptionHandlerStrategy implements ExceptionHandlerStrategy {
 
     @Override
+    public Class getHandleClass() {
+        return Throwable.class;
+    }
+
+    @Override
     public ExceptionHandlerResult handleException(Throwable throwable) {
         ResponseResult<String> responseResult = new ResponseResult<>(SystemResponseInfo.GATEWAY_ERROR,throwable.getMessage());
         ExceptionHandlerResult result = new ExceptionHandlerResult(HttpStatus.INTERNAL_SERVER_ERROR, JSON.toJSONString(responseResult));

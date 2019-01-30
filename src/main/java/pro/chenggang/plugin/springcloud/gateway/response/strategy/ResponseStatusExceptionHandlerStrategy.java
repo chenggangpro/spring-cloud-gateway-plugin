@@ -16,6 +16,11 @@ import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
 public class ResponseStatusExceptionHandlerStrategy implements ExceptionHandlerStrategy{
 
     @Override
+    public Class getHandleClass() {
+        return ResponseStatusException.class;
+    }
+
+    @Override
     public ExceptionHandlerResult handleException(Throwable throwable) {
         ResponseStatusException responseStatusException = (ResponseStatusException) throwable;
         ResponseResult<String> responseResult = new ResponseResult<>(SystemResponseInfo.SERVICE_NOT_AVAILABLE,throwable.getMessage());

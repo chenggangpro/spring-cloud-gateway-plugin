@@ -8,8 +8,13 @@ import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
  * @author chenggang
  * @date 2019/01/29
  */
-@FunctionalInterface
-public interface ExceptionHandlerStrategy {
+public interface ExceptionHandlerStrategy<T extends Throwable> {
+
+    /**
+     * get the exception class
+     * @return Class
+     */
+    Class<T> getHandleClass();
 
     /**
      * Handle Exception

@@ -3,7 +3,7 @@ package pro.chenggang.plugin.springcloud.gateway.config;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
-import org.springframework.cloud.gateway.support.NotFoundException;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -11,7 +11,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
-import org.springframework.web.server.ResponseStatusException;
 import pro.chenggang.plugin.springcloud.gateway.response.JsonExceptionHandler;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.DefaultExceptionHandlerStrategyFactory;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.ExceptionHandlerStrategyFactory;
@@ -21,6 +20,7 @@ import pro.chenggang.plugin.springcloud.gateway.response.strategy.ResponseStatus
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Gateway Plugin Config
@@ -51,17 +51,17 @@ public class GlobalExceptionJsonHandlerConfig {
 
     /**
      * ExceptionHandlerStrategyFactory
-     * @param notFoundExceptionHandlerStrategy
-     * @param responseStatusExceptionHandlerStrategy
+     * @param applicationContext
      * @return
      */
     @Bean
     @ConditionalOnMissingBean(ExceptionHandlerStrategyFactory.class)
-    public ExceptionHandlerStrategyFactory exceptionHandlerStrategyFactory(ExceptionHandlerStrategy notFoundExceptionHandlerStrategy,
-                                                                           ExceptionHandlerStrategy responseStatusExceptionHandlerStrategy){
+    public ExceptionHandlerStrategyFactory exceptionHandlerStrategyFactory(ApplicationContext applicationContext){
         DefaultExceptionHandlerStrategyFactory factory = new DefaultExceptionHandlerStrategyFactory();
-        factory.addStrategy(NotFoundException.class,notFoundExceptionHandlerStrategy);
-        factory.addStrategy(ResponseStatusException.class,responseStatusExceptionHandlerStrategy);
+        Map<String, ExceptionHandlerStrategy> exceptionHandlerStrategyMap = applicationContext.getBeansOfType(ExceptionHandlerStrategy.class);
+        if(null != exceptionHandlerStrategyMap && !exceptionHandlerStrategyMap.isEmpty()){
+            exceptionHandlerStrategyMap.forEach((k,v)->factory.addStrategy(v));
+        }
         return factory;
     }
 

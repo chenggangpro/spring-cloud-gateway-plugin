@@ -1,6 +1,7 @@
 package pro.chenggang.plugin.springcloud.gateway.response.factory;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
 import pro.chenggang.plugin.springcloud.gateway.response.strategy.DefaultExceptionHandlerStrategy;
 import pro.chenggang.plugin.springcloud.gateway.response.strategy.ExceptionHandlerStrategy;
 
@@ -30,10 +31,12 @@ public class DefaultExceptionHandlerStrategyFactory implements ExceptionHandlerS
 
     /**
      * addStrategy
-     * @param clazz
      * @param exceptionHandlerStrategy
      */
-    public void addStrategy(Class<? extends Throwable> clazz,ExceptionHandlerStrategy exceptionHandlerStrategy){
+    public void addStrategy(ExceptionHandlerStrategy exceptionHandlerStrategy){
+        Assert.notNull(exceptionHandlerStrategy,"ExceptionStrategy Required");
+        Class clazz = exceptionHandlerStrategy.getHandleClass();
+        Assert.notNull(clazz,"ExceptionStrategy Handle Class Required");
         if(!strategyContainer.containsKey(clazz)){
             strategyContainer.put(clazz, exceptionHandlerStrategy);
             log.debug("[DefaultExceptionHandlerStrategyFactory] Add Strategy,Class:{},Strategy:{}",clazz,exceptionHandlerStrategy);
