@@ -29,6 +29,9 @@ public @interface EnableGatewayPlugin {
      */
     String ENABLE_GREY_ROUTE_ATTRIBUTE_NAME = "enableGreyRoute";
 
+    /**
+     * Grey Ribbon Rule Attribute Name
+     */
     String GREY_RIBBON_RULE_ATTRIBUTE_NAME = "greyRibbonRule";
 
     /**
