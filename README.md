@@ -10,10 +10,30 @@ Spring Cloud Gateway Extra Plugin
 
 ### How To Use This Feature
 
-Note: This package Is Not On Maven Central. You should use `mvn install` or `mvn deploy` to add this dependency to your repositories
+##### Note:
+ 
+    * This Dependency Base On Spring Cloud Gateway[`Greenwich.RELEASE`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
+    * This Dependency Is Not In Maven Central. You should use `mvn install` or `mvn deploy` to add this dependency to your repositories.
 
 * 1 . Include Dependency
-
+    
+    > Spring Cloud Gateway
+    
+    ```xml
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Greenwich.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    ```
+    > Gateway Plugin
+    
     ```xml
     <dependency>
         <groupId>pro.chenggang</groupId>
