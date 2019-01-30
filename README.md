@@ -10,7 +10,7 @@ Spring Cloud Gateway Extra Plugin
 
 ### How To Use This Feature
 
-    Note: This package Is Not On Maven Central. You should use `mvn install` or `mvn deploy` to add this dependency to your repositories
+Note: This package Is Not On Maven Central. You should use `mvn install` or `mvn deploy` to add this dependency to your repositories
 
 * 1 . Include Dependency
 
@@ -158,7 +158,7 @@ Spring Cloud Gateway Extra Plugin
     
     * The Properties Active Rule Principle
     
-        When Request URL Route To Provider1,When The Request JsonBody Or Form Data Contain The Key ->Key1 And Match Any Of The Value->[value1,value2,value3]
+        When Request URL Route To Provider1,When The Request JsonBody Or Form Data Contain The Key ->`Key1` And Match Any Of The Value->[`value1`,`value2`,`value3`]
         The Route The Request To The Service Which Setup The MetaInfo With Specific Version Which Match The Gateway Grey Setup 
     
 
