@@ -32,6 +32,7 @@ import java.util.Map;
 
 /**
  * Gateway Context Filter
+ *
  * @author chenggang
  * @date 2019/01/29
  */
@@ -45,24 +46,30 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        //save request path and serviceId into gateway context
+        /**
+         * save request path and serviceId into gateway context
+         */
         ServerHttpRequest request = exchange.getRequest();
-        //if dev header route attribute is not blank then user header value as serviceId
+        /**
+         * if dev header route attribute is not blank then user header value as serviceId
+         */
         GatewayContext gatewayContext = new GatewayContext();
         gatewayContext.getAllRequestData().addAll(request.getQueryParams());
-        //save gateway context into exchange
-        exchange.getAttributes().put(GatewayContext.CACHE_GATEWAY_CONTEXT,gatewayContext);
+        /**
+         * save gateway context into exchange
+         */
+        exchange.getAttributes().put(GatewayContext.CACHE_GATEWAY_CONTEXT, gatewayContext);
         HttpHeaders headers = request.getHeaders();
         MediaType contentType = headers.getContentType();
-        if(headers.getContentLength()>0){
-            if(MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)){
-                return readBody(exchange, chain,gatewayContext);
+        if (headers.getContentLength() > 0) {
+            if (MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)) {
+                return readBody(exchange, chain, gatewayContext);
             }
-            if(MediaType.APPLICATION_FORM_URLENCODED.equals(contentType)){
-                return readFormData(exchange, chain,gatewayContext);
+            if (MediaType.APPLICATION_FORM_URLENCODED.equals(contentType)) {
+                return readFormData(exchange, chain, gatewayContext);
             }
         }
-        log.debug("[GatewayContext]ContentType:{},Gateway context is set with {}",contentType, gatewayContext);
+        log.debug("[GatewayContext]ContentType:{},Gateway context is set with {}", contentType, gatewayContext);
         return chain.filter(exchange);
 
     }
@@ -75,11 +82,12 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
 
     /**
      * ReadFormData
+     *
      * @param exchange
      * @param chain
      * @return
      */
-    private Mono<Void> readFormData(ServerWebExchange exchange,GatewayFilterChain chain,GatewayContext gatewayContext){
+    private Mono<Void> readFormData(ServerWebExchange exchange, GatewayFilterChain chain, GatewayContext gatewayContext) {
         HttpHeaders headers = exchange.getRequest().getHeaders();
         return exchange.getFormData()
                 .doOnNext(multiValueMap -> {
@@ -89,41 +97,53 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
                 })
                 .then(Mono.defer(() -> {
                     Charset charset = headers.getContentType().getCharset();
-                    charset = charset == null? StandardCharsets.UTF_8:charset;
+                    charset = charset == null ? StandardCharsets.UTF_8 : charset;
                     String charsetName = charset.name();
                     MultiValueMap<String, String> formData = gatewayContext.getFormData();
-                    //formData is empty just return
-                    if(null == formData || formData.isEmpty()){
+                    /**
+                     * formData is empty just return
+                     */
+                    if (null == formData || formData.isEmpty()) {
                         return chain.filter(exchange);
                     }
                     StringBuilder formDataBodyBuilder = new StringBuilder();
                     String entryKey;
                     List<String> entryValue;
                     try {
-                        //remove system param ,repackage form data
+                        /**
+                         * remove system param ,repackage form data
+                         */
                         for (Map.Entry<String, List<String>> entry : formData.entrySet()) {
                             entryKey = entry.getKey();
                             entryValue = entry.getValue();
                             if (entryValue.size() > 1) {
-                                for(String value : entryValue){
+                                for (String value : entryValue) {
                                     formDataBodyBuilder.append(entryKey).append("=").append(URLEncoder.encode(value, charsetName)).append("&");
                                 }
                             } else {
                                 formDataBodyBuilder.append(entryKey).append("=").append(URLEncoder.encode(entryValue.get(0), charsetName)).append("&");
                             }
                         }
-                    }catch (UnsupportedEncodingException e){}
-                    //substring with the last char '&'
+                    } catch (UnsupportedEncodingException e) {
+                    }
+                    /**
+                     * substring with the last char '&'
+                     */
                     String formDataBodyString = "";
-                    if(formDataBodyBuilder.length()>0){
+                    if (formDataBodyBuilder.length() > 0) {
                         formDataBodyString = formDataBodyBuilder.substring(0, formDataBodyBuilder.length() - 1);
                     }
-                    //get data bytes
-                    byte[] bodyBytes =  formDataBodyString.getBytes(charset);
+                    /**
+                     * get data bytes
+                     */
+                    byte[] bodyBytes = formDataBodyString.getBytes(charset);
                     int contentLength = bodyBytes.length;
                     ServerHttpRequestDecorator decorator = new ServerHttpRequestDecorator(
                             exchange.getRequest()) {
-                        //change content-length
+
+                        /**
+                         * change content-length
+                         */
                         @Override
                         public HttpHeaders getHeaders() {
                             HttpHeaders httpHeaders = new HttpHeaders();
@@ -136,10 +156,12 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
                             return httpHeaders;
                         }
 
-                        //read bytes to Flux<Databuffer>
+                        /**
+                         * read bytes to Flux<Databuffer>
+                         */
                         @Override
                         public Flux<DataBuffer> getBody() {
-                            return DataBufferUtils.read(new ByteArrayResource(bodyBytes),new NettyDataBufferFactory(ByteBufAllocator.DEFAULT),contentLength);
+                            return DataBufferUtils.read(new ByteArrayResource(bodyBytes), new NettyDataBufferFactory(ByteBufAllocator.DEFAULT), contentLength);
                         }
                     };
                     ServerWebExchange mutateExchange = exchange.mutate().request(decorator).build();
@@ -149,27 +171,38 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
 
     /**
      * ReadJsonBody
+     *
      * @param exchange
      * @param chain
      * @return
      */
-    private Mono<Void> readBody(ServerWebExchange exchange,GatewayFilterChain chain,GatewayContext gatewayContext){
-        //join the body
+    private Mono<Void> readBody(ServerWebExchange exchange, GatewayFilterChain chain, GatewayContext gatewayContext) {
+        /**
+         * join the body
+         */
         return DataBufferUtils.join(exchange.getRequest().getBody())
                 .flatMap(dataBuffer -> {
-                    // read the body Flux<Databuffer>
+                    /**
+                     * read the body Flux<Databuffer>
+                     */
                     DataBufferUtils.retain(dataBuffer);
                     Flux<DataBuffer> cachedFlux = Flux.defer(() -> Flux.just(dataBuffer.slice(0, dataBuffer.readableByteCount())));
-                    //repackage ServerHttpRequest
+                    /**
+                     * repackage ServerHttpRequest
+                     */
                     ServerHttpRequest mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {
                         @Override
                         public Flux<DataBuffer> getBody() {
                             return cachedFlux;
                         }
                     };
-                    //mutate exchage with new ServerHttpRequest
+                    /**
+                     * mutate exchage with new ServerHttpRequest
+                     */
                     ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-                    //read body string with default messageReaders
+                    /**
+                     * read body string with default messageReaders
+                     */
                     return ServerRequest.create(mutatedExchange, messageReaders)
                             .bodyToMono(String.class)
                             .doOnNext(objectValue -> {

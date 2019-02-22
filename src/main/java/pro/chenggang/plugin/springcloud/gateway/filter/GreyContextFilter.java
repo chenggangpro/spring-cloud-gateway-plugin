@@ -31,94 +31,121 @@ import java.util.stream.Collectors;
 
 /**
  * Grey Context Filter
+ *
  * @author chenggang
  * @date 2019/01/29
  */
 @Slf4j
 @AllArgsConstructor
-public class GreyContextFilter implements GlobalFilter,Ordered {
+public class GreyContextFilter implements GlobalFilter, Ordered {
 
     private GreyProperties greyProperties;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        Route route = exchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR,null);
-        if(null == route){
+        Route route = exchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR, null);
+        if (null == route) {
             return chain.filter(exchange);
         }
-        //get route if route isn't lb just return chain
+        /**
+         * get route if route isn't lb just return chain
+         */
         URI routeUri = route.getUri();
-        if(!"lb".equalsIgnoreCase(routeUri.getScheme())){
+        if (!"lb".equalsIgnoreCase(routeUri.getScheme())) {
             return chain.filter(exchange);
         }
-        //get serverId by route
+        /**
+         * get serverId by route
+         */
         String serviceId = routeUri.getHost().toLowerCase();
-        //get gateway context
+        /**
+         * get gateway context
+         */
         GatewayContext gatewayContext = exchange.getAttribute(GatewayContext.CACHE_GATEWAY_CONTEXT);
-        //get grey rule
+        /**
+         * get grey rule
+         */
         GreyProperties.GreyRule greyRule = greyProperties.getGreyRule(serviceId);
-        //grey rule is empty or null ,return chain
-        if(null == greyRule || null == greyRule.getRules() || greyRule.getRules().isEmpty()){
+        /**
+         * grey rule is empty or null ,return chain
+         */
+        if (null == greyRule || null == greyRule.getRules() || greyRule.getRules().isEmpty()) {
             return chain.filter(exchange);
         }
-        //get contentType
+        /**
+         * get contentType
+         */
         MediaType contentType = exchange.getRequest().getHeaders().getContentType();
-        //get grey rules and grey operation type
+        /**
+         * get grey rules and grey operation type
+         */
         LinkedHashMap<String, List<String>> ruleMap = greyRule.getRuleMap();
         Set<String> ruleKeys = ruleMap.keySet();
         GreyProperties.GreyRule.Operation operation = greyRule.getOperation();
-        //get All request data (query params and form data params)
+        /**
+         * get All request data (query params and form data params)
+         */
         MultiValueMap<String, String> allRequestData = gatewayContext.getAllRequestData();
-        //init filtered request data with grey rule keys
+        /**
+         * init filtered request data with grey rule keys
+         */
         Set<Map.Entry<String, List<String>>> filteredRequestData = Collections.emptySet();
-        //json contentType init
-        if(MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)){
+        /**
+         * json contentType init
+         */
+        if (MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)) {
             String jsonBody = gatewayContext.getCacheBody();
-            if(StringUtils.isNotBlank(jsonBody)){
-                Map<String,List<String>> jsonParam = new HashMap<>();
-                ruleKeys.forEach(key->{
+            if (StringUtils.isNotBlank(jsonBody)) {
+                Map<String, List<String>> jsonParam = new HashMap<>();
+                ruleKeys.forEach(key -> {
                     Object eval = JSONPath.eval(JSONObject.parseObject(jsonBody), String.format("$..%s", key));
-                    if(null != eval){
+                    if (null != eval) {
                         List value = (List) eval;
-                        if(!value.isEmpty()){
+                        if (!value.isEmpty()) {
                             List<String> valueList = new ArrayList<>(value.size());
-                            for(Object tempValue : value){
+                            for (Object tempValue : value) {
                                 valueList.add(tempValue.toString());
                             }
-                            jsonParam.put(key,valueList);
+                            jsonParam.put(key, valueList);
                         }
                     }
                 });
-                if(!jsonParam.isEmpty()){
+                if (!jsonParam.isEmpty()) {
                     filteredRequestData = jsonParam.entrySet();
                 }
             }
-        }else if(!allRequestData.isEmpty()){
-            //other contentType And AllRequestData is Not Empty
+        } else if (!allRequestData.isEmpty()) {
+            /**
+             * other contentType And AllRequestData is Not Empty
+             */
             filteredRequestData = allRequestData.entrySet()
                     .stream()
                     .filter(stringListEntry -> ruleKeys.contains(stringListEntry.getKey()))
                     .collect(Collectors.toSet());
         }
-        //validate requestData in different operation
+        /**
+         * validate requestData in different operation
+         */
         boolean matched = false;
-        switch (operation){
+        switch (operation) {
             case OR:
-                matched = validateGreyOrOperation(filteredRequestData,ruleMap);
+                matched = validateGreyOrOperation(filteredRequestData, ruleMap);
                 break;
             case AND:
-                matched = validateGreyAndOperation(filteredRequestData,ruleMap);
+                matched = validateGreyAndOperation(filteredRequestData, ruleMap);
                 break;
             default:
                 break;
         }
-        //cache grey context
+        /**
+         * cache grey context
+         */
         GreyContext greyContext = new GreyContext();
         greyContext.setServiceId(serviceId);
         greyContext.setVersion(greyRule.getVersion());
         greyContext.setMatched(matched);
-        exchange.getAttributes().put(GreyContext.CACHE_GREY_CONTEXT,greyContext);
-        log.debug("[GreyContextGlobalFilter]ServiceId:{},Matched Grey Rules,Cache GreyContext:{}",serviceId,greyContext);
+        exchange.getAttributes().put(GreyContext.CACHE_GREY_CONTEXT, greyContext);
+        log.debug("[GreyContextGlobalFilter]ServiceId:{},Matched Grey Rules,Cache GreyContext:{}", serviceId, greyContext);
         return chain.filter(exchange);
     }
 
@@ -129,22 +156,23 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
 
     /**
      * validate grey rule use or operation
+     *
      * @param filteredRequestData
      * @param rules
      * @return
      */
-    private boolean validateGreyOrOperation(Set<Map.Entry<String, List<String>>> filteredRequestData,LinkedHashMap<String, List<String>> rules){
-        if(null == filteredRequestData || filteredRequestData.isEmpty() || null == rules || rules.isEmpty()){
+    private boolean validateGreyOrOperation(Set<Map.Entry<String, List<String>>> filteredRequestData, LinkedHashMap<String, List<String>> rules) {
+        if (null == filteredRequestData || filteredRequestData.isEmpty() || null == rules || rules.isEmpty()) {
             return false;
         }
         List<String> paramValue;
         String paramKey;
-        for(Map.Entry<String, List<String>> entry:filteredRequestData){
-            paramValue= entry.getValue();
+        for (Map.Entry<String, List<String>> entry : filteredRequestData) {
+            paramValue = entry.getValue();
             paramKey = entry.getKey();
-            for(String ruleParam : rules.get(paramKey)){
-                if(paramValue.contains(ruleParam)){
-                    log.debug("[GreyContextFilter](ValidateGreyOrOperation)Match Grey Rules In RequestParam,Grey Rule Key:{},RuleValue:{},ParamValueList:{}",paramKey,ruleParam,paramValue);
+            for (String ruleParam : rules.get(paramKey)) {
+                if (paramValue.contains(ruleParam)) {
+                    log.debug("[GreyContextFilter](ValidateGreyOrOperation)Match Grey Rules In RequestParam,Grey Rule Key:{},RuleValue:{},ParamValueList:{}", paramKey, ruleParam, paramValue);
                     return true;
                 }
             }
@@ -154,28 +182,29 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
 
     /**
      * validate grey rule use and operation
+     *
      * @param filteredRequestData
      * @param rules
      * @return
      */
-    private boolean validateGreyAndOperation(Set<Map.Entry<String, List<String>>> filteredRequestData,LinkedHashMap<String, List<String>> rules){
-        if(null == filteredRequestData || filteredRequestData.isEmpty() || null == rules || rules.isEmpty()){
+    private boolean validateGreyAndOperation(Set<Map.Entry<String, List<String>>> filteredRequestData, LinkedHashMap<String, List<String>> rules) {
+        if (null == filteredRequestData || filteredRequestData.isEmpty() || null == rules || rules.isEmpty()) {
             return false;
         }
         List<String> paramValue;
         String paramKey;
-        int matchedSize =0;
-        for(Map.Entry<String, List<String>> entry:filteredRequestData){
-            paramValue= entry.getValue();
+        int matchedSize = 0;
+        for (Map.Entry<String, List<String>> entry : filteredRequestData) {
+            paramValue = entry.getValue();
             paramKey = entry.getKey();
-            for(String ruleParam : rules.get(paramKey)){
-                if(paramValue.contains(ruleParam)){
+            for (String ruleParam : rules.get(paramKey)) {
+                if (paramValue.contains(ruleParam)) {
                     matchedSize++;
                 }
             }
         }
-        if(matchedSize == rules.size()){
-            log.debug("[GreyContextFilter](ValidateGreyAndOperation)Matched Grey Rules,RuleSize:{},Matched Size:{},Return True",rules.size(),matchedSize);
+        if (matchedSize == rules.size()) {
+            log.debug("[GreyContextFilter](ValidateGreyAndOperation)Matched Grey Rules,RuleSize:{},Matched Size:{},Return True", rules.size(), matchedSize);
             return true;
         }
         return false;

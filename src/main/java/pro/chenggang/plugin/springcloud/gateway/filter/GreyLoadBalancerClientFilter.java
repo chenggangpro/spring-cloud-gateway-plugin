@@ -21,6 +21,7 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.a
 
 /**
  * Grey Load Balancer Client Filter
+ *
  * @author chenggang
  * @date 2019/01/29
  */
@@ -31,7 +32,7 @@ public class GreyLoadBalancerClientFilter extends LoadBalancerClientFilter {
     public static ThreadLocal<GreyContext> contextThreadLocal = new ThreadLocal<>();
 
     public GreyLoadBalancerClientFilter(LoadBalancerClient loadBalancer, LoadBalancerProperties properties) {
-        super(loadBalancer,properties);
+        super(loadBalancer, properties);
     }
 
     @Override
@@ -46,16 +47,22 @@ public class GreyLoadBalancerClientFilter extends LoadBalancerClientFilter {
         if (url == null || (!"lb".equals(url.getScheme()) && !"lb".equals(schemePrefix))) {
             return chain.filter(exchange);
         }
-        //preserve the original url
+        /**
+         * preserve the original url
+         */
         addOriginalRequestUrl(exchange, url);
 
         log.trace("LoadBalancerClientFilter url before: " + url);
 
-         // get grey context set in temp threadLocal then choose instance
+        /**
+         * get grey context set in temp threadLocal then choose instance
+         */
         GreyContext greyContext = exchange.getAttribute(GreyContext.CACHE_GREY_CONTEXT);
         contextThreadLocal.set(greyContext);
         final ServiceInstance instance = choose(exchange);
-        //remove threadLocal value
+        /**
+         * remove threadLocal value
+         */
         contextThreadLocal.remove();
         if (instance == null) {
             throw new NotFoundException("Unable to find instance for " + url.getHost());
@@ -63,8 +70,11 @@ public class GreyLoadBalancerClientFilter extends LoadBalancerClientFilter {
 
         URI uri = exchange.getRequest().getURI();
 
-        // if the `lb:<scheme>` mechanism was used, use `<scheme>` as the default,
-        // if the loadbalancer doesn't provide one.
+
+        /**
+         * if the `lb:<scheme>` mechanism was used, use `<scheme>` as the default,
+         * if the loadbalancer doesn't provide one.
+         */
         String overrideScheme = null;
         if (schemePrefix != null) {
             overrideScheme = url.getScheme();

@@ -19,11 +19,12 @@ import java.net.URI;
 
 /**
  * Filter To Log Request And Response(exclude response body)
+ *
  * @author chenggang
  * @date 2019/01/29
  */
 @Slf4j
-public class RequestLogFilter implements GlobalFilter,Ordered {
+public class RequestLogFilter implements GlobalFilter, Ordered {
 
     private static final String START_TIME = "startTime";
 
@@ -36,12 +37,14 @@ public class RequestLogFilter implements GlobalFilter,Ordered {
         ServerHttpRequest request = exchange.getRequest();
         URI requestURI = request.getURI();
         String scheme = requestURI.getScheme();
-        //not http or https scheme
+        /**
+         * not http or https scheme
+         */
         if ((!HTTP_SCHEME.equalsIgnoreCase(scheme) && !HTTPS_SCHEME.equals(scheme))) {
             return chain.filter(exchange);
         }
         logRequest(exchange);
-        return chain.filter(exchange).then(Mono.fromRunnable(()->logResponse(exchange)));
+        return chain.filter(exchange).then(Mono.fromRunnable(() -> logResponse(exchange)));
     }
 
     @Override
@@ -51,51 +54,53 @@ public class RequestLogFilter implements GlobalFilter,Ordered {
 
     /**
      * log request
+     *
      * @param exchange
      */
-    private void logRequest(ServerWebExchange exchange){
+    private void logRequest(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
         URI requestURI = request.getURI();
         String scheme = requestURI.getScheme();
         HttpHeaders headers = request.getHeaders();
         long startTime = System.currentTimeMillis();
         exchange.getAttributes().put(START_TIME, startTime);
-        log.info("[RequestLogFilter](Request) Start Timestamp:{}",startTime);
-        log.info("[RequestLogFilter](Request)Scheme:{},Path:{}",scheme,requestURI.getPath());
-        log.info("[RequestLogFilter](Request)Method:{},IP:{},Host:{}",request.getMethod(), GatewayUtils.getIpAddress(request),requestURI.getHost());
-        headers.forEach((key,value)-> log.debug("[RequestLogFilter](Request)Headers:Key->{},Value->{}",key,value));
+        log.info("[RequestLogFilter](Request) Start Timestamp:{}", startTime);
+        log.info("[RequestLogFilter](Request)Scheme:{},Path:{}", scheme, requestURI.getPath());
+        log.info("[RequestLogFilter](Request)Method:{},IP:{},Host:{}", request.getMethod(), GatewayUtils.getIpAddress(request), requestURI.getHost());
+        headers.forEach((key, value) -> log.debug("[RequestLogFilter](Request)Headers:Key->{},Value->{}", key, value));
         MultiValueMap<String, String> queryParams = request.getQueryParams();
-        if(!queryParams.isEmpty()){
-            queryParams.forEach((key,value)-> log.debug("[RequestLogFilter](Request)Query Param :Key->({}),Value->({})",key,value));
+        if (!queryParams.isEmpty()) {
+            queryParams.forEach((key, value) -> log.debug("[RequestLogFilter](Request)Query Param :Key->({}),Value->({})", key, value));
         }
         MediaType contentType = headers.getContentType();
         long length = headers.getContentLength();
-        log.debug("[RequestLogFilter](Request)ContentType:{},Content Length:{}",contentType,length);
+        log.debug("[RequestLogFilter](Request)ContentType:{},Content Length:{}", contentType, length);
         GatewayContext gatewayContext = exchange.getAttribute(GatewayContext.CACHE_GATEWAY_CONTEXT);
-        if(length>0 && null != contentType && (contentType.includes(MediaType.APPLICATION_JSON)
-                ||contentType.includes(MediaType.APPLICATION_JSON_UTF8))){
-            log.debug("[RequestLogFilter](Request) JsonBody:{}",gatewayContext.getCacheBody());
+        if (length > 0 && null != contentType && (contentType.includes(MediaType.APPLICATION_JSON)
+                || contentType.includes(MediaType.APPLICATION_JSON_UTF8))) {
+            log.debug("[RequestLogFilter](Request) JsonBody:{}", gatewayContext.getCacheBody());
         }
-        if(length>0 && null != contentType  && contentType.includes(MediaType.APPLICATION_FORM_URLENCODED)){
-            log.debug("[RequestLogFilter](Request) FormData:{}",gatewayContext.getFormData());
+        if (length > 0 && null != contentType && contentType.includes(MediaType.APPLICATION_FORM_URLENCODED)) {
+            log.debug("[RequestLogFilter](Request) FormData:{}", gatewayContext.getFormData());
         }
     }
 
     /**
      * log response exclude response body
+     *
      * @param exchange
      */
-    private Mono<Void> logResponse(ServerWebExchange exchange){
+    private Mono<Void> logResponse(ServerWebExchange exchange) {
         Long startTime = exchange.getAttribute(START_TIME);
         Long executeTime = (System.currentTimeMillis() - startTime);
         ServerHttpResponse response = exchange.getResponse();
-        log.info("[RequestLogFilter](Response)HttpStatus:{}",response.getStatusCode());
+        log.info("[RequestLogFilter](Response)HttpStatus:{}", response.getStatusCode());
         HttpHeaders headers = response.getHeaders();
-        headers.forEach((key,value)-> log.debug("[RequestLogFilter](Response)Headers:Key->{},Value->{}",key,value));
+        headers.forEach((key, value) -> log.debug("[RequestLogFilter](Response)Headers:Key->{},Value->{}", key, value));
         MediaType contentType = headers.getContentType();
         long length = headers.getContentLength();
-        log.debug("[RequestLogFilter](Response)ContentType:{},Content Length:{}",contentType,length);
-        log.info("[RequestLogFilter](Response)Original Path:{},Cost:{} ms", exchange.getRequest().getURI().getPath(),executeTime);
+        log.debug("[RequestLogFilter](Response)ContentType:{},Content Length:{}", contentType, length);
+        log.info("[RequestLogFilter](Response)Original Path:{},Cost:{} ms", exchange.getRequest().getURI().getPath(), executeTime);
         return Mono.empty();
     }
 
