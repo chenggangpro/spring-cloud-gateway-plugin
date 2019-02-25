@@ -17,11 +17,28 @@
 
 	<name>spring-cloud-gateway-plugin</name>
 	<description>Spring Cloud Gateway Plugin Project</description>
+	<url>https://github.com/chenggangpro/spring-cloud-gateway-plugin.git</url>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<tag>master</tag>
+		<url>git@github.com:chenggangpro/spring-cloud-gateway-plugin.git</url>
+		<connection>scm:git:git@github.com:chenggangpro/spring-cloud-gateway-plugin.git</connection>
+		<developerConnection>scm:git:git@github.com:chenggangpro/spring-cloud-gateway-plugin.git</developerConnection>
+	</scm>
 
 	<developers>
 		<developer>
 			<name>ChengGang</name>
 			<email>chenggangpro@gmail.com</email>
+			<url>https://blog.chenggang.pro</url>
 		</developer>
 	</developers>
 
@@ -142,6 +159,30 @@
 					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
