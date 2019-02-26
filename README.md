@@ -15,7 +15,7 @@ Spring Cloud Gateway Extra Plugin
 ##### Note:
  
    * This Dependency Base On Spring Cloud Gateway[`Greenwich.RELEASE`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
-   * This Dependency Is Not In Maven Central. You should use `mvn install` or `mvn deploy` to add this dependency to your repositories.
+   * This Dependency Is Now In Maven Central. 
 
 ##### Step
 
