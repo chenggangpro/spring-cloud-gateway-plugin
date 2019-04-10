@@ -36,7 +36,9 @@ public class RequestLogFilter implements GlobalFilter,Ordered {
         ServerHttpRequest request = exchange.getRequest();
         URI requestURI = request.getURI();
         String scheme = requestURI.getScheme();
-        //not http or https scheme
+        /*
+         * not http or https scheme
+         */
         if ((!HTTP_SCHEME.equalsIgnoreCase(scheme) && !HTTPS_SCHEME.equals(scheme))) {
             return chain.filter(exchange);
         }

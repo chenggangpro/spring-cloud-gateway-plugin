@@ -11,11 +11,6 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 public class GatewayUtils {
 
     /**
-     * path separator
-     */
-    public static final String PATH_SEPARATOR = "/";
-
-    /**
      * get Real Ip Address
      * @param request ServerHttpRequest
      * @return

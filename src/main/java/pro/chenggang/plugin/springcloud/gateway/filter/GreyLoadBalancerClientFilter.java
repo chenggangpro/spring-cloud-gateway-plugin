@@ -46,16 +46,19 @@ public class GreyLoadBalancerClientFilter extends LoadBalancerClientFilter {
         if (url == null || (!"lb".equals(url.getScheme()) && !"lb".equals(schemePrefix))) {
             return chain.filter(exchange);
         }
-        //preserve the original url
+        /*
+         * preserve the original url
+         */
         addOriginalRequestUrl(exchange, url);
 
         log.trace("LoadBalancerClientFilter url before: " + url);
 
-         // get grey context set in temp threadLocal then choose instance
+        /*
+         * get grey context set in temp threadLocal then choose instance
+         */
         GreyContext greyContext = exchange.getAttribute(GreyContext.CACHE_GREY_CONTEXT);
         contextThreadLocal.set(greyContext);
         final ServiceInstance instance = choose(exchange);
-        //remove threadLocal value
         contextThreadLocal.remove();
         if (instance == null) {
             throw new NotFoundException("Unable to find instance for " + url.getHost());

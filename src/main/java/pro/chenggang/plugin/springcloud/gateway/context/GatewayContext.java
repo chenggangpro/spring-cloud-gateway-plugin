@@ -3,6 +3,7 @@ package pro.chenggang.plugin.springcloud.gateway.context;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -22,6 +23,10 @@ public class GatewayContext {
      * cache json body
      */
     private String cacheBody;
+    /**
+     * request headers
+     */
+    private HttpHeaders requestHeaders;
     /**
      * cache form data
      */

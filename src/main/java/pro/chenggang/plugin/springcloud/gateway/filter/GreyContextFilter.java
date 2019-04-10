@@ -10,6 +10,7 @@ import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
@@ -21,8 +22,8 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,32 +47,36 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
         if(null == route){
             return chain.filter(exchange);
         }
-        //get route if route isn't lb just return chain
+        /*
+         * get route if route isn't lb just return chain
+         */
         URI routeUri = route.getUri();
         if(!"lb".equalsIgnoreCase(routeUri.getScheme())){
             return chain.filter(exchange);
         }
-        //get serverId by route
+        /*
+         * reset Grey Filter ThreadLocal
+         */
+        GreyLoadBalancerClientFilter.contextThreadLocal.remove();
         String serviceId = routeUri.getHost().toLowerCase();
-        //get gateway context
         GatewayContext gatewayContext = exchange.getAttribute(GatewayContext.CACHE_GATEWAY_CONTEXT);
-        //get grey rule
         GreyProperties.GreyRule greyRule = greyProperties.getGreyRule(serviceId);
-        //grey rule is empty or null ,return chain
+        /*
+         * grey rule is empty or null ,return chain
+         */
         if(null == greyRule || null == greyRule.getRules() || greyRule.getRules().isEmpty()){
             return chain.filter(exchange);
         }
-        //get contentType
         MediaType contentType = exchange.getRequest().getHeaders().getContentType();
-        //get grey rules and grey operation type
         LinkedHashMap<String, List<String>> ruleMap = greyRule.getRuleMap();
         Set<String> ruleKeys = ruleMap.keySet();
         GreyProperties.GreyRule.Operation operation = greyRule.getOperation();
-        //get All request data (query params and form data params)
         MultiValueMap<String, String> allRequestData = gatewayContext.getAllRequestData();
-        //init filtered request data with grey rule keys
-        Set<Map.Entry<String, List<String>>> filteredRequestData = Collections.emptySet();
-        //json contentType init
+        HttpHeaders requestHeaders = gatewayContext.getRequestHeaders();
+        /*
+         * init filtered request data with grey rule keys
+         */
+        Set<Map.Entry<String, List<String>>> filteredRequestData = new HashSet<>();
         if(MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)){
             String jsonBody = gatewayContext.getCacheBody();
             if(StringUtils.isNotBlank(jsonBody)){
@@ -90,17 +95,21 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
                     }
                 });
                 if(!jsonParam.isEmpty()){
-                    filteredRequestData = jsonParam.entrySet();
+                    filteredRequestData.addAll(jsonParam.entrySet());
                 }
             }
-        }else if(!allRequestData.isEmpty()){
-            //other contentType And AllRequestData is Not Empty
-            filteredRequestData = allRequestData.entrySet()
+        }
+        if(!allRequestData.isEmpty()){
+            filteredRequestData.addAll(
+                    allRequestData.entrySet()
                     .stream()
                     .filter(stringListEntry -> ruleKeys.contains(stringListEntry.getKey()))
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toSet()));
         }
-        //validate requestData in different operation
+        if(!requestHeaders.isEmpty()){
+            filteredRequestData.addAll(requestHeaders.entrySet().stream().filter(stringListEntry -> ruleKeys.contains(stringListEntry.getKey()))
+                    .collect(Collectors.toSet()));
+        }
         boolean matched = false;
         switch (operation){
             case OR:
@@ -112,7 +121,9 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
             default:
                 break;
         }
-        //cache grey context
+        /*
+         * cache grey context
+         */
         GreyContext greyContext = new GreyContext();
         greyContext.setServiceId(serviceId);
         greyContext.setVersion(greyRule.getVersion());

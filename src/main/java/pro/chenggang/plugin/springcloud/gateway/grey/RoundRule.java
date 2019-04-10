@@ -23,7 +23,7 @@ public abstract class RoundRule extends PredicateBasedRule {
 
     private static Logger log = LoggerFactory.getLogger(RoundRobinRule.class);
 
-    public RoundRule() {
+    RoundRule() {
         nextServerCyclicCounter = new AtomicInteger(0);
     }
 
@@ -40,7 +40,7 @@ public abstract class RoundRule extends PredicateBasedRule {
 
         Server server = null;
         int count = 0;
-        while (server == null && count++ < 10) {
+        while (count++ < 10) {
             List<Server> reachableServers = lb.getReachableServers();
             List<Server> allServers = lb.getAllServers();
             int upCount = reachableServers.size();
@@ -85,8 +85,9 @@ public abstract class RoundRule extends PredicateBasedRule {
         for (;;) {
             int current = nextServerCyclicCounter.get();
             int next = (current + 1) % modulo;
-            if (nextServerCyclicCounter.compareAndSet(current, next))
+            if (nextServerCyclicCounter.compareAndSet(current, next)) {
                 return next;
+            }
         }
     }
 
@@ -97,6 +98,7 @@ public abstract class RoundRule extends PredicateBasedRule {
 
     @Override
     public void initWithNiwsConfig(IClientConfig clientConfig) {
+
     }
 
 }

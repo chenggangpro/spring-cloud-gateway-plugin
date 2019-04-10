@@ -32,7 +32,7 @@ public class GreyWeightResponseRule extends RoundRule {
 
     private CompositePredicate compositePredicate;
 
-    public static final IClientConfigKey<Integer> WEIGHT_TASK_TIMER_INTERVAL_CONFIG_KEY = new IClientConfigKey<Integer>() {
+    private static final IClientConfigKey<Integer> WEIGHT_TASK_TIMER_INTERVAL_CONFIG_KEY = new IClientConfigKey<Integer>() {
         @Override
         public String key() {
             return "ServerWeightTaskTimerInterval";
@@ -49,20 +49,23 @@ public class GreyWeightResponseRule extends RoundRule {
         }
     };
 
-    public static final int DEFAULT_TIMER_INTERVAL = 30 * 1000;
+    private static final int DEFAULT_TIMER_INTERVAL = 30 * 1000;
 
     private int serverWeightTaskTimerInterval = DEFAULT_TIMER_INTERVAL;
 
-    // holds the accumulated weight from index 0 to current index
-    // for example, element at index 2 holds the sum of weight of servers from 0 to 2
+    /*
+     * holds the accumulated weight from index 0 to current index
+     * for example, element at index 2 holds the sum of weight of servers from 0 to 2
+     */
+
     private volatile List<Double> accumulatedWeights = new ArrayList<Double>();
 
 
     private final Random random = new Random();
 
-    protected Timer serverWeightTimer = null;
+    private Timer serverWeightTimer = null;
 
-    protected AtomicBoolean serverWeightAssignmentInProgress = new AtomicBoolean(false);
+    private AtomicBoolean serverWeightAssignmentInProgress = new AtomicBoolean(false);
 
     String name = "unknown";
 
@@ -128,7 +131,7 @@ public class GreyWeightResponseRule extends RoundRule {
         }
         Server server = null;
 
-        while (server == null) {
+        while (true) {
             // get hold of the current reference in case it is changed from the other thread
             List<Double> currentWeights = accumulatedWeights;
             if (Thread.interrupted()) {
@@ -184,12 +187,11 @@ public class GreyWeightResponseRule extends RoundRule {
             // Next.
             server = null;
         }
-        return server;
     }
 
     class DynamicServerWeightTask extends TimerTask {
 
-        public DynamicServerWeightTask() {
+        DynamicServerWeightTask() {
             log.debug("Init DynamicServerWeightTask Success,Server Name:{}",name);
         }
 
@@ -206,7 +208,7 @@ public class GreyWeightResponseRule extends RoundRule {
 
     class ServerWeight {
 
-        public void maintainWeights() {
+        void maintainWeights() {
             ILoadBalancer lb = getLoadBalancer();
             if (lb == null) {
                 return;
@@ -232,7 +234,7 @@ public class GreyWeightResponseRule extends RoundRule {
                 }
                 // weight for each server is (sum of responseTime of all servers - responseTime)
                 // so that the longer the response time, the less the weight and the less likely to be chosen
-                Double weightSoFar = 0.0;
+                double weightSoFar = 0.0;
 
                 // create new list and hot swap the reference
                 List<Double> finalWeights = new ArrayList<Double>();
@@ -252,7 +254,7 @@ public class GreyWeightResponseRule extends RoundRule {
         }
     }
 
-    void setWeights(List<Double> weights) {
+    private void setWeights(List<Double> weights) {
         this.accumulatedWeights = weights;
     }
 

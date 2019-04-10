@@ -78,16 +78,16 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         ServerHttpRequest request = exchange.getRequest();
-        /**
+        /*
          * get strategy
          */
         ExceptionHandlerStrategy strategy = exceptionHandlerStrategyFactory.getStrategy(ex.getClass());
         ExceptionHandlerResult result = strategy.handleException(ex);
-        /**
+        /*
          * log error
          */
         log.warn("[Global Exception Handler]Request Path:{},Exception Msg:{}",request.getPath(),ex.getMessage());
-        /**
+        /*
          * if is Default Strategy Print Stack Trace
          */
         if(strategy instanceof DefaultExceptionHandlerStrategy && log.isDebugEnabled()){
@@ -102,7 +102,7 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
 
     }
 
-    protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
+    private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
         ExceptionHandlerResult result = exceptionHandlerResult.get();
         return ServerResponse.status(result.getHttpStatus())
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
