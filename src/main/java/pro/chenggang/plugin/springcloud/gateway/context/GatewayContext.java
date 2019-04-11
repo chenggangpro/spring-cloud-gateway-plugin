@@ -22,7 +22,11 @@ public class GatewayContext {
     /**
      * cache json body
      */
-    private String cacheBody;
+    private String requestBody;
+    /**
+     * cache Response Body
+     */
+    private Object responseBody;
     /**
      * request headers
      */

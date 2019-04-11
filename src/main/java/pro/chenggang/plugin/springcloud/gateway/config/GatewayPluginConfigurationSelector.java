@@ -29,7 +29,7 @@ public class GatewayPluginConfigurationSelector implements ImportSelector {
         List<Class> configClassList = new ArrayList<>(5);
         configClassList.add(GatewayPluginConfig.class);
         if(enableRequestLog){
-            configClassList.add(RequestLogConfig.class);
+            configClassList.add(RequestResponseLogConfig.class);
         }
         if(enableGreyRoute){
             configClassList.add(GreyRouteConfig.class);

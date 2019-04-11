@@ -187,7 +187,7 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
                     return ServerRequest.create(mutatedExchange, messageReaders)
                             .bodyToMono(String.class)
                             .doOnNext(objectValue -> {
-                                gatewayContext.setCacheBody(objectValue);
+                                gatewayContext.setRequestBody(objectValue);
                                 log.debug("[GatewayContext]Read JsonBody Success");
                             }).then(chain.filter(mutatedExchange));
                 });
