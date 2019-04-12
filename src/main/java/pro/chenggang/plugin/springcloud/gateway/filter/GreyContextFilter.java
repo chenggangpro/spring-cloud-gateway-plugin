@@ -78,7 +78,7 @@ public class GreyContextFilter implements GlobalFilter,Ordered {
          */
         Set<Map.Entry<String, List<String>>> filteredRequestData = new HashSet<>();
         if(MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)){
-            String jsonBody = gatewayContext.getCacheBody();
+            String jsonBody = gatewayContext.getRequestBody();
             if(StringUtils.isNotBlank(jsonBody)){
                 Map<String,List<String>> jsonParam = new HashMap<>();
                 ruleKeys.forEach(key->{

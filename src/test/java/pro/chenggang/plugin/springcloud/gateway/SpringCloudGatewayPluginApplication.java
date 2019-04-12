@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import pro.chenggang.plugin.springcloud.gateway.annotation.EnableGatewayPlugin;
 
 @SpringBootApplication
-@EnableGatewayPlugin(enableGreyRoute = true,greyRibbonRule = EnableGatewayPlugin.GreyRibbonRule.WeightResponse)
+@EnableGatewayPlugin
 public class SpringCloudGatewayPluginApplication {
 
 	public static void main(String[] args) {

@@ -3,11 +3,15 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
+## Current Version: 1.2.0.RELEASE
+
 ### This Plugin Support Below Features:
 
 * [x] Cache Request Body And Form Body
 * [x] Add Request Log Filter To Log Request And Response
+* [x] Add Read Json Response Body And Log Response Body
 * [x] Add Global Exception Handler With Json
+* [x] Add Custom Exception Handler
 * [x] Add Grey Route With Ribbon
 
 ### How To Use This Feature
@@ -16,6 +20,14 @@ Spring Cloud Gateway Extra Plugin
  
    * This Dependency Base On Spring Cloud Gateway[`Greenwich.RELEASE`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
    * This Dependency Is Now In Maven Central. 
+
+###### Change Log
+
+|Version|Note|
+|:-----:|:--------|
+|1.0.0.RELEASE|Use Annotation To Enable plugin functions|
+|1.1.0.RELEASE|As V1.0.0.RELEASE,Change Read Form Data Method|
+|1.2.0.RELEASE|Simplify `@EnableGatewayPlugin`,Use Yaml Settings To Enable Plugin Functions|
 
 ##### Step
 
@@ -53,7 +65,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>1.1.0.RELEASE</version>
+        <version>1.2.0.RELEASE</version>
     </dependency>
     ```
   
@@ -80,9 +92,11 @@ Spring Cloud Gateway Extra Plugin
 
 * 3 . Choose Plugin Feature To Use
 
-    By use this annotation to enable the plugin,the plugin support switch to choose feature
+    By use this annotation `@EnableGatewayPlugin` to enable the plugin,the plugin support switch to choose feature
     By default,the `GatewayContext Filter` is always into system
-
+    
+    > 1.0.0.RELEASE,1.1.0.RELEASE Should use annotation method As Below to Choose which plugin function what you want to use.
+    
     ```java
     public @interface EnableGatewayPlugin {
     
@@ -128,6 +142,25 @@ Spring Cloud Gateway Extra Plugin
         }
     }
     ```     
+    
+    > 1.2.0.RELEASE Should use properties settings As Below to Choose which plugin function what you want to use.
+    
+    ```yaml
+    spring:
+      profiles:
+        active: dev
+      cloud:
+        gateway:
+          plugin:
+            config:
+              log-request: true
+              read-request-data: true
+              read-response-data: true
+              exception-json-handler: true
+            grey:
+              enable: false
+              grey-ribbon-rule: weight_response
+    ```
 
 * 4 . User GatewayContext
 
@@ -145,13 +178,53 @@ Spring Cloud Gateway Extra Plugin
 
     * Setup Gateway Properties
     
-        ```yaml
-        spring:
-          cloud:
-            gateway:
+    > 1.0.0.RELEASE,1.1.0.RELEASE Grey Rule Setting
+    
+    ```yaml
+    spring:
+      cloud:
+        gateway:
+          grey:
+            greyRuleList:
+              - serviceId: privider1
+                version: 2.0.0
+                operation: OR
+                rules:
+                  - key: key1
+                    value:
+                      - value1
+                      - value2
+                      - value3
+                  - key: key2
+                    value:
+                      - value4
+                      - value5
+                      - value6
+              - serviceId: provider2
+                version: 2.0.0
+                operation: AND
+                rules:
+                  - key: keya
+                    value:
+                      - value1a
+                      - value2a
+                      - value3a
+                  - key: keyb
+                    value:
+                      - value4b
+                      - value5b
+                      - value6b
+    ```     
+    > 1.2.0.RELEASE Grey Rule Setting
+ 
+    ```yaml
+    spring:
+      cloud:
+        gateway:
+          plugin:
               grey:
-                greyRuleList:
-                  - serviceId: privider1
+                grey-rule-list:
+                  - service-id: privider1
                     version: 2.0.0
                     operation: OR
                     rules:
@@ -165,7 +238,7 @@ Spring Cloud Gateway Extra Plugin
                           - value4
                           - value5
                           - value6
-                  - serviceId: provider2
+                  - service-id: provider2
                     version: 2.0.0
                     operation: AND
                     rules:
@@ -179,7 +252,7 @@ Spring Cloud Gateway Extra Plugin
                           - value4b
                           - value5b
                           - value6b
-        ```     
+        ```    
     
     * Set Up Service MetaInfo
     

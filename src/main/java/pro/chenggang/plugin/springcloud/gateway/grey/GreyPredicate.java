@@ -8,7 +8,7 @@ import com.netflix.niws.loadbalancer.DiscoveryEnabledServer;
 import lombok.extern.slf4j.Slf4j;
 import pro.chenggang.plugin.springcloud.gateway.context.GreyContext;
 import pro.chenggang.plugin.springcloud.gateway.filter.GreyLoadBalancerClientFilter;
-import pro.chenggang.plugin.springcloud.gateway.option.SystemParamConst;
+import pro.chenggang.plugin.springcloud.gateway.option.SystemConst;
 
 import java.util.Map;
 
@@ -50,7 +50,7 @@ public class GreyPredicate extends AbstractServerPredicate {
                  * the request should route to this (version) server
                  * the current server is (version) server
                  */
-                if(version.equals(metadata.get(SystemParamConst.VERSION))){
+                if(version.equals(metadata.get(SystemConst.VERSION))){
                     log.debug("[GreyPredicate](GreyContext Param Matched)GreyContext Version Matched,Return True,ServiceId:{},InstanceId:{},Instance Metadata:{}",serviceId,instanceInfo.getInstanceId(),metadata);
                     return true;
                 }
@@ -72,7 +72,7 @@ public class GreyPredicate extends AbstractServerPredicate {
                  * the request should route to the other(un-version) server
                  * the current server is (version) server
                  */
-                if(version.equals(metadata.get(SystemParamConst.VERSION))){
+                if(version.equals(metadata.get(SystemConst.VERSION))){
                     log.debug("[GreyPredicate](GreyContext Param Matched)GreyContext Version Matched,Return False,ServiceId:{},InstanceId:{},Instance Metadata:{}",serviceId,instanceInfo.getInstanceId(),metadata);
                     return false;
                 }
