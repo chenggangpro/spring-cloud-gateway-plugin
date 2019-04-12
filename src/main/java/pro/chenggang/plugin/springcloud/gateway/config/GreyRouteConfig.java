@@ -1,6 +1,7 @@
 package pro.chenggang.plugin.springcloud.gateway.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.gateway.config.LoadBalancerProperties;
 import org.springframework.cloud.gateway.filter.LoadBalancerClientFilter;
@@ -17,6 +18,7 @@ import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
  * @date 2019/01/29
  */
 @Configuration
+@ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "enable",havingValue = "true")
 public class GreyRouteConfig {
 
     @Bean

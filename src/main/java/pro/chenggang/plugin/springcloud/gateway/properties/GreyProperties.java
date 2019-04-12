@@ -24,7 +24,20 @@ import java.util.Map;
 @ConfigurationProperties(GreyProperties.GREY_PROPERTIES_PREFIX)
 public class GreyProperties implements InitializingBean{
 
-    public static final String GREY_PROPERTIES_PREFIX = "spring.cloud.gateway.grey";
+    public static final String GREY_PROPERTIES_PREFIX = "spring.cloud.gateway.plugin.grey";
+
+    /**
+     * Enable Grey Route
+     */
+    @Getter
+    @Setter
+    private Boolean enable = false;
+    /**
+     * Choose Grey Ribbon Rule
+     */
+    @Getter
+    @Setter
+    private GreyRibbonRule greyRibbonRule = GreyRibbonRule.DEFAULT;
     /**
      * Grey Rule
      */
@@ -32,7 +45,7 @@ public class GreyProperties implements InitializingBean{
     @Setter
     private List<GreyRule> greyRuleList = Collections.emptyList();
     /**
-     * Grey Rule Map
+     * Grey Rule Map,Do Not Manually Set This Properties
      */
     @Getter
     private Map<String,GreyRule> greyRuleMap = Collections.emptyMap();
@@ -108,5 +121,19 @@ public class GreyProperties implements InitializingBean{
             OR
         }
 
+    }
+
+    /**
+     * GreyRule
+     */
+    public enum GreyRibbonRule{
+        /**
+         * default grey rule based on  round rule
+         */
+        DEFAULT,
+        /**
+         * weight response rule base on WeightResponseRUle
+         */
+        WEIGHT_RESPONSE,
     }
 }

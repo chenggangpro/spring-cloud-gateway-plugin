@@ -5,11 +5,13 @@ import com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.netflix.ribbon.RibbonClientConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import pro.chenggang.plugin.springcloud.gateway.grey.GreyPredicateRule;
+import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
 
 /**
  * Gateway Plugin Config
@@ -19,10 +21,12 @@ import pro.chenggang.plugin.springcloud.gateway.grey.GreyPredicateRule;
 @Configuration
 @ConditionalOnClass(DiscoveryEnabledNIWSServerList.class)
 @AutoConfigureBefore(RibbonClientConfiguration.class)
+@ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "enable",havingValue = "true")
 public class GreyDefaultRuleConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+    @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "greyRibbonRule",havingValue = "DEFAULT")
     public IRule ribbonRule() {
         return new GreyPredicateRule();
     }

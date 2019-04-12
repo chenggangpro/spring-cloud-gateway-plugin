@@ -2,6 +2,7 @@ package pro.chenggang.plugin.springcloud.gateway.config;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
+import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
 import pro.chenggang.plugin.springcloud.gateway.response.JsonExceptionHandler;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.DefaultExceptionHandlerStrategyFactory;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.ExceptionHandlerStrategyFactory;
@@ -26,6 +28,7 @@ import java.util.Map;
  * @date 2019/01/29
  */
 @Configuration
+@ConditionalOnProperty(prefix = GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX,value = "exceptionJsonHandler",havingValue = "true")
 public class GlobalExceptionJsonHandlerConfig {
 
     /**

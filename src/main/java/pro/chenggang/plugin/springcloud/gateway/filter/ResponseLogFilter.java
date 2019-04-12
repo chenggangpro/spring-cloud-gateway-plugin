@@ -31,14 +31,18 @@ import reactor.core.publisher.Mono;
  * @classDesc:
  * @author: chenggang
  * @createTime: 2019-04-11
- * @version: v1.0.0
- * @email: cg@choicesoft.com.cn
+ * @version: v1.2.0
  */
 @Slf4j
 public class ResponseLogFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        GatewayContext gatewayContext = exchange.getAttribute(GatewayContext.CACHE_GATEWAY_CONTEXT);
+        if(!gatewayContext.getReadResponseData()){
+            log.debug("[ResponseLogFilter]Properties Set Not To Read Response Data");
+            return chain.filter(exchange);
+        }
         ServerHttpResponseDecorator responseDecorator = new ServerHttpResponseDecorator(exchange.getResponse()) {
             @Override
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
@@ -51,6 +55,7 @@ public class ResponseLogFilter implements GlobalFilter, Ordered {
                             DefaultClientResponse clientResponse = new DefaultClientResponse(new ResponseAdapter(cachedFlux, exchange.getResponse().getHeaders()), ExchangeStrategies.withDefaults());
                             MediaType contentType = clientResponse.headers().contentType().orElse(MediaType.APPLICATION_OCTET_STREAM);
                             if(!contentType.equals(MediaType.APPLICATION_JSON) && !contentType.equals(MediaType.APPLICATION_JSON_UTF8)){
+                                log.debug("[ResponseLogFilter]Response ContentType Is Not APPLICATION_JSON Or APPLICATION_JSON_UTF8");
                                 return Mono.defer(()-> bodyInserter.insert(outputMessage, new BodyInserterContext())
                                         .then(Mono.defer(() -> {
                                             Flux<DataBuffer> messageBody = cachedFlux;
@@ -65,6 +70,7 @@ public class ResponseLogFilter implements GlobalFilter, Ordered {
                                     .doOnNext(originalBody -> {
                                         GatewayContext gatewayContext = exchange.getAttribute(GatewayContext.CACHE_GATEWAY_CONTEXT);
                                         gatewayContext.setResponseBody(originalBody);
+                                        log.debug("[ResponseLogFilter]Read Response Data To Gateway Context Success");
                                     })
                                     .then(Mono.defer(()-> bodyInserter.insert(outputMessage, new BodyInserterContext())
                                             .then(Mono.defer(() -> {
