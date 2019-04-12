@@ -1,5 +1,7 @@
 package pro.chenggang.plugin.springcloud.gateway.option;
 
+import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
+
 /**
  * The Order Of Plugin Filter
  * @author chenggang
@@ -19,6 +21,10 @@ public enum FilterOrderEnum {
      * Request Log Filter
      */
     REQUEST_LOG_FILTER(Integer.MIN_VALUE+2),
+    /**
+     * Cache Response Data Filter
+     */
+    RESPONSE_DATA_FILTER(NettyWriteResponseFilter.WRITE_RESPONSE_FILTER_ORDER - 1),
 
     ;
 

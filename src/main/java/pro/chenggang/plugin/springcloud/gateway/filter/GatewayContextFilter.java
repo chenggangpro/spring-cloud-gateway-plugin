@@ -1,5 +1,6 @@
 package pro.chenggang.plugin.springcloud.gateway.filter;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -22,6 +23,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 import pro.chenggang.plugin.springcloud.gateway.context.GatewayContext;
 import pro.chenggang.plugin.springcloud.gateway.option.FilterOrderEnum;
+import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -38,7 +40,10 @@ import java.util.Map;
  * @date 2019/01/29
  */
 @Slf4j
+@AllArgsConstructor
 public class GatewayContextFilter implements GlobalFilter, Ordered {
+
+    private GatewayPluginProperties gatewayPluginProperties;
 
     /**
      * default HttpMessageReader
@@ -49,6 +54,13 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         GatewayContext gatewayContext = new GatewayContext();
+        gatewayContext.setReadRequestData(gatewayPluginProperties.getReadRequestData());
+        gatewayContext.setReadResponseData(gatewayPluginProperties.getReadResponseData());
+        if(!gatewayContext.getReadRequestData()){
+            exchange.getAttributes().put(GatewayContext.CACHE_GATEWAY_CONTEXT,gatewayContext);
+            log.debug("[GatewayContext]Properties Set To Not Read Request Data");
+            return chain.filter(exchange);
+        }
         gatewayContext.getAllRequestData().addAll(request.getQueryParams());
         /*
          * save gateway context into exchange
@@ -187,7 +199,7 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
                     return ServerRequest.create(mutatedExchange, messageReaders)
                             .bodyToMono(String.class)
                             .doOnNext(objectValue -> {
-                                gatewayContext.setCacheBody(objectValue);
+                                gatewayContext.setRequestBody(objectValue);
                                 log.debug("[GatewayContext]Read JsonBody Success");
                             }).then(chain.filter(mutatedExchange));
                 });
