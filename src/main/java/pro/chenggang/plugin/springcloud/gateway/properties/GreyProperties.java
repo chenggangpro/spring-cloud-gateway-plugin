@@ -1,5 +1,6 @@
 package pro.chenggang.plugin.springcloud.gateway.properties;
 
+import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +26,7 @@ public class GreyProperties implements InitializingBean{
 
     public static final String GREY_PROPERTIES_PREFIX = "spring.cloud.gateway.plugin.grey";
 
+    public static Map<String,GreyRule> greyRuleMap;
     /**
      * Enable Grey Route
      */
@@ -44,18 +45,14 @@ public class GreyProperties implements InitializingBean{
     @Getter
     @Setter
     private List<GreyRule> greyRuleList = Collections.emptyList();
-    /**
-     * Grey Rule Map,Do Not Manually Set This Properties
-     */
-    @Getter
-    private Map<String,GreyRule> greyRuleMap = Collections.emptyMap();
 
     @Override
     public void afterPropertiesSet() {
         if(null == greyRuleList || greyRuleList.isEmpty()){
+            greyRuleMap = Collections.emptyMap();
             return;
         }
-        greyRuleMap = new HashMap<>(greyRuleList.size(),1);
+        greyRuleMap = Maps.newHashMapWithExpectedSize(greyRuleList.size());
         for(GreyRule grayRule : greyRuleList){
             greyRuleMap.put(grayRule.getServiceId(),grayRule);
         }
