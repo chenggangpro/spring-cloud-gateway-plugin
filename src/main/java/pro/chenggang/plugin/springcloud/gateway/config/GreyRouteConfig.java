@@ -1,5 +1,6 @@
 package pro.chenggang.plugin.springcloud.gateway.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
@@ -17,6 +18,7 @@ import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
  * @author chenggang
  * @date 2019/01/29
  */
+@Slf4j
 @Configuration
 @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "enable",havingValue = "true")
 public class GreyRouteConfig {
@@ -30,13 +32,17 @@ public class GreyRouteConfig {
     @Primary
     @Bean
     public LoadBalancerClientFilter loadBalancerClientFilter(LoadBalancerClient client, LoadBalancerProperties properties) {
-        return new GreyLoadBalancerClientFilter(client,properties);
+        GreyLoadBalancerClientFilter greyLoadBalancerClientFilter = new GreyLoadBalancerClientFilter(client, properties);
+        log.debug("Load LoadBalancerClientFilter Config Bean");
+        return greyLoadBalancerClientFilter;
     }
 
     @Bean
     @ConditionalOnMissingBean(GreyContextFilter.class)
     public GreyContextFilter greyContextFilter(GreyProperties greyProperties){
-        return new GreyContextFilter(greyProperties);
+        GreyContextFilter greyContextFilter = new GreyContextFilter(greyProperties);
+        log.debug("Load GreyContextFilter Config Bean");
+        return greyContextFilter;
     }
 
 }

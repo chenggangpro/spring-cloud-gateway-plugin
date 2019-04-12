@@ -2,6 +2,7 @@ package pro.chenggang.plugin.springcloud.gateway.config;
 
 import com.netflix.loadbalancer.IRule;
 import com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -18,6 +19,7 @@ import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
  * @author chenggang
  * @date 2019/01/29
  */
+@Slf4j
 @Configuration
 @ConditionalOnClass(DiscoveryEnabledNIWSServerList.class)
 @AutoConfigureBefore(RibbonClientConfiguration.class)
@@ -28,6 +30,8 @@ public class GreyWeightResponseRuleConfig {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "greyRibbonRule",havingValue = "WEIGHT_RESPONSE")
     public IRule ribbonRule() {
-        return new GreyWeightResponseRule();
+        GreyWeightResponseRule greyWeightResponseRule = new GreyWeightResponseRule();
+        log.debug("Load Grey Weight Response Rule Config Bean");
+        return greyWeightResponseRule;
     }
 }

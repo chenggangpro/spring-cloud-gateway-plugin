@@ -1,5 +1,6 @@
 package pro.chenggang.plugin.springcloud.gateway.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -27,6 +28,7 @@ import java.util.Map;
  * @author chenggang
  * @date 2019/01/29
  */
+@Slf4j
 @Configuration
 @ConditionalOnProperty(prefix = GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX,value = "exceptionJsonHandler",havingValue = "true")
 public class GlobalExceptionJsonHandlerConfig {
@@ -44,6 +46,7 @@ public class GlobalExceptionJsonHandlerConfig {
         if(null != exceptionHandlerStrategyMap && !exceptionHandlerStrategyMap.isEmpty()){
             exceptionHandlerStrategyMap.forEach((k,v)->factory.addStrategy(v));
         }
+        log.debug("Load ExceptionHandler Strategy Factory Config Bean");
         return factory;
     }
 
@@ -66,6 +69,7 @@ public class GlobalExceptionJsonHandlerConfig {
         jsonExceptionHandler.setViewResolvers(viewResolversProvider.getIfAvailable(Collections::emptyList));
         jsonExceptionHandler.setMessageWriters(serverCodecConfigurer.getWriters());
         jsonExceptionHandler.setMessageReaders(serverCodecConfigurer.getReaders());
+        log.debug("Load Json Exception Handler Config Bean");
         return jsonExceptionHandler;
     }
 }
