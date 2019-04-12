@@ -3,6 +3,8 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
+## Current Version: 1.2.0.RELEASE
+
 ### This Plugin Support Below Features:
 
 * [x] Cache Request Body And Form Body
