@@ -30,7 +30,7 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
-@ConditionalOnProperty(prefix = GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX,value = "exceptionJsonHandler",havingValue = "true")
+@ConditionalOnProperty(prefix = GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX,value = "exception-json-handler",havingValue = "true")
 public class GlobalExceptionJsonHandlerConfig {
 
     /**

@@ -28,7 +28,7 @@ public class GreyWeightResponseRuleConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "greyRibbonRule",havingValue = "WEIGHT_RESPONSE")
+    @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "grey-ribbon-rule",havingValue = "WEIGHT_RESPONSE")
     public IRule ribbonRule() {
         GreyWeightResponseRule greyWeightResponseRule = new GreyWeightResponseRule();
         log.debug("Load Grey Weight Response Rule Config Bean");

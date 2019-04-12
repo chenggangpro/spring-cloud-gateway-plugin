@@ -30,9 +30,9 @@ public class GatewayPluginProperties {
     /**
      * Enable Or Disable Log Request Detail
      */
-    private Boolean logRequest = true;
+    private Boolean logRequest = false;
     /**
      * Enable Or Disable Global Exception Json Handler
      */
-    private Boolean exceptionJsonHandler = true;
+    private Boolean exceptionJsonHandler = false;
 }

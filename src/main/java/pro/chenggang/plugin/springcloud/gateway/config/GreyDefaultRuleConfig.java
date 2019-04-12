@@ -28,7 +28,7 @@ public class GreyDefaultRuleConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "greyRibbonRule",havingValue = "DEFAULT")
+    @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "grey-ribbon-rule",havingValue = "DEFAULT")
     public IRule ribbonRule() {
         GreyPredicateRule greyPredicateRule = new GreyPredicateRule();
         log.debug("Load Default Grey Ribbon Rule Config Bean");
