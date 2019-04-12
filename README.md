@@ -7,7 +7,9 @@ Spring Cloud Gateway Extra Plugin
 
 * [x] Cache Request Body And Form Body
 * [x] Add Request Log Filter To Log Request And Response
+* [x] Add Read Json Response Body And Log Response Body
 * [x] Add Global Exception Handler With Json
+* [x] Add Custom Exception Handler
 * [x] Add Grey Route With Ribbon
 
 ### How To Use This Feature
@@ -16,6 +18,14 @@ Spring Cloud Gateway Extra Plugin
  
    * This Dependency Base On Spring Cloud Gateway[`Greenwich.RELEASE`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
    * This Dependency Is Now In Maven Central. 
+
+###### Change Log
+
+|Version|Note|
+|:-----:|:--------|
+|1.0.0.RELEASE|Use Annotation To Enable plugin functions|
+|1.1.0.RELEASE|As V1.0.0.RELEASE,Change Read Form Data Method|
+|1.2.0.RELEASE|Simplify `@EnableGatewayPlugin`,Use Yaml Settings To Enable Plugin Functions|
 
 ##### Step
 
@@ -133,8 +143,7 @@ Spring Cloud Gateway Extra Plugin
     
     > 1.2.0.RELEASE Should use properties settings As Below to Choose which plugin function what you want to use.
     
-    ```java
-    
+    ```yaml
     spring:
       profiles:
         active: dev
@@ -149,7 +158,6 @@ Spring Cloud Gateway Extra Plugin
             grey:
               enable: false
               grey-ribbon-rule: weight_response
-            
     ```
 
 * 4 . User GatewayContext
