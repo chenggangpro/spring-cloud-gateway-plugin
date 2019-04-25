@@ -1,6 +1,10 @@
 package pro.chenggang.plugin.springcloud.gateway.grey;
 
+import com.alibaba.fastjson.JSON;
 import com.netflix.client.config.IClientConfig;
+import com.netflix.loadbalancer.AbstractServerPredicate;
+import com.netflix.loadbalancer.AvailabilityPredicate;
+import com.netflix.loadbalancer.CompositePredicate;
 import com.netflix.loadbalancer.ILoadBalancer;
 import com.netflix.loadbalancer.PredicateBasedRule;
 import com.netflix.loadbalancer.RoundRobinRule;
@@ -23,13 +27,28 @@ public abstract class RoundRule extends PredicateBasedRule {
 
     private static Logger log = LoggerFactory.getLogger(RoundRobinRule.class);
 
+    private CompositePredicate compositePredicate;
+
     RoundRule() {
         nextServerCyclicCounter = new AtomicInteger(0);
+        GreyPredicate greyPredicate = new GreyPredicate();
+        AvailabilityPredicate availabilityPredicate = new AvailabilityPredicate(this,null);
+        compositePredicate = createCompositePredicate(greyPredicate, availabilityPredicate);
     }
 
     public RoundRule(ILoadBalancer lb) {
         this();
         setLoadBalancer(lb);
+    }
+
+    private CompositePredicate createCompositePredicate(GreyPredicate p1, AvailabilityPredicate p2) {
+        return CompositePredicate.withPredicates(p1, p2).build();
+
+    }
+
+    @Override
+    public AbstractServerPredicate getPredicate() {
+        return this.compositePredicate;
     }
 
     public Server choose(ILoadBalancer lb, Object key) {
@@ -42,7 +61,7 @@ public abstract class RoundRule extends PredicateBasedRule {
         int count = 0;
         while (count++ < 10) {
             List<Server> reachableServers = lb.getReachableServers();
-            List<Server> allServers = lb.getAllServers();
+            List<Server> allServers = getPredicate().getEligibleServers(lb.getAllServers(),key);
             int upCount = reachableServers.size();
             int serverCount = allServers.size();
 
@@ -61,6 +80,7 @@ public abstract class RoundRule extends PredicateBasedRule {
             }
 
             if (server.isAlive() && (server.isReadyToServe())) {
+                log.debug("[RoundRule]Choose Server ==> {} [MetaInfo:{}]",server.getId(), JSON.toJSONString(server.getMetaInfo()));
                 return (server);
             }
 
