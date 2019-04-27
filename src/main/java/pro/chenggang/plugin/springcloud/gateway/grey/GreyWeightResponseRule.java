@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.client.config.IClientConfigKey;
 import com.netflix.loadbalancer.AbstractLoadBalancer;
+import com.netflix.loadbalancer.AbstractServerPredicate;
 import com.netflix.loadbalancer.BaseLoadBalancer;
 import com.netflix.loadbalancer.ILoadBalancer;
 import com.netflix.loadbalancer.LoadBalancerStats;
@@ -66,6 +67,10 @@ public class GreyWeightResponseRule extends RoundRule {
 
     public GreyWeightResponseRule() {
         super();
+    }
+
+    public GreyWeightResponseRule(List<AbstractServerPredicate> customPredicateList) {
+        super(customPredicateList);
     }
 
     @Override

@@ -11,7 +11,9 @@ import com.netflix.loadbalancer.RoundRobinRule;
 import com.netflix.loadbalancer.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,21 +31,22 @@ public abstract class RoundRule extends PredicateBasedRule {
 
     private CompositePredicate compositePredicate;
 
-    RoundRule() {
+    RoundRule(){
+        this(null);
+    }
+
+    RoundRule(List<AbstractServerPredicate> customPredicateList) {
         nextServerCyclicCounter = new AtomicInteger(0);
-        GreyPredicate greyPredicate = new GreyPredicate();
+        if(CollectionUtils.isEmpty(customPredicateList)){
+            customPredicateList = new ArrayList<>(1);
+        }
         AvailabilityPredicate availabilityPredicate = new AvailabilityPredicate(this,null);
-        compositePredicate = createCompositePredicate(greyPredicate, availabilityPredicate);
+        customPredicateList.add(availabilityPredicate);
+        compositePredicate = createCompositePredicate(customPredicateList.toArray(new AbstractServerPredicate[0]));
     }
 
-    public RoundRule(ILoadBalancer lb) {
-        this();
-        setLoadBalancer(lb);
-    }
-
-    private CompositePredicate createCompositePredicate(GreyPredicate p1, AvailabilityPredicate p2) {
-        return CompositePredicate.withPredicates(p1, p2).build();
-
+    private CompositePredicate createCompositePredicate(AbstractServerPredicate ... predicates) {
+        return CompositePredicate.withPredicates(predicates).build();
     }
 
     @Override

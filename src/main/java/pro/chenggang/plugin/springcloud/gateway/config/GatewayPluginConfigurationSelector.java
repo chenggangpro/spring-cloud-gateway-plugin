@@ -17,15 +17,13 @@ public class GatewayPluginConfigurationSelector implements ImportSelector {
 
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        List<Class> configClassList = new ArrayList<>(6);
+        List<Class> configClassList = new ArrayList<>(7);
         configClassList.add(GatewayPluginConfig.class);
         configClassList.add(RequestResponseLogConfig.class);
         configClassList.add(GreyRouteConfig.class);
-        configClassList.add(GreyDefaultRuleConfig.class);
+        configClassList.add(GreyDefaultRoundRuleConfig.class);
         configClassList.add(GreyWeightResponseRuleConfig.class);
         configClassList.add(GlobalExceptionJsonHandlerConfig.class);
-        return configClassList
-                .stream()
-                .map(Class::getName).toArray(String[]::new);
+        return configClassList.stream().map(Class::getName).toArray(String[]::new);
     }
 }

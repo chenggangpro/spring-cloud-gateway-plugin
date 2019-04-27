@@ -296,3 +296,29 @@ Spring Cloud Gateway Extra Plugin
     }
     ```
 
+* 8 . Use Temporary Offline Endpoint
+
+    In some way, Our service need to restart or rebuild .If you use Eureka Discover Server, You know when your service are shutting down,
+    Eureka Server need time to notify all service that.This Endpoint support a rest api to temporary offline some service in 1 minute.
+    
+    The Rest Api Is :
+    
+    > Request Method: `Post`
+    
+    > Request URI: `/gateway/plugin/offline`
+    
+    > Request ContentType: `application/json`
+    
+    > Request Body:
+    
+    ```json
+    {
+      "name": "serviceId",
+      "ip": "serviceIp",
+      "port": "servicePort",
+      "offlineTime": "serviceOfflineTimestamp"
+    }
+    ```
+    
+    > Response Data:   `success` Or `data-empty-error`
+     
