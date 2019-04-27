@@ -1,13 +1,19 @@
 package pro.chenggang.plugin.springcloud.gateway.grey;
 
+import com.alibaba.fastjson.JSON;
 import com.netflix.client.config.IClientConfig;
+import com.netflix.loadbalancer.AbstractServerPredicate;
+import com.netflix.loadbalancer.AvailabilityPredicate;
+import com.netflix.loadbalancer.CompositePredicate;
 import com.netflix.loadbalancer.ILoadBalancer;
 import com.netflix.loadbalancer.PredicateBasedRule;
 import com.netflix.loadbalancer.RoundRobinRule;
 import com.netflix.loadbalancer.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,13 +29,29 @@ public abstract class RoundRule extends PredicateBasedRule {
 
     private static Logger log = LoggerFactory.getLogger(RoundRobinRule.class);
 
-    RoundRule() {
-        nextServerCyclicCounter = new AtomicInteger(0);
+    private CompositePredicate compositePredicate;
+
+    RoundRule(){
+        this(null);
     }
 
-    public RoundRule(ILoadBalancer lb) {
-        this();
-        setLoadBalancer(lb);
+    RoundRule(List<AbstractServerPredicate> customPredicateList) {
+        nextServerCyclicCounter = new AtomicInteger(0);
+        if(CollectionUtils.isEmpty(customPredicateList)){
+            customPredicateList = new ArrayList<>(1);
+        }
+        AvailabilityPredicate availabilityPredicate = new AvailabilityPredicate(this,null);
+        customPredicateList.add(availabilityPredicate);
+        compositePredicate = createCompositePredicate(customPredicateList.toArray(new AbstractServerPredicate[0]));
+    }
+
+    private CompositePredicate createCompositePredicate(AbstractServerPredicate ... predicates) {
+        return CompositePredicate.withPredicates(predicates).build();
+    }
+
+    @Override
+    public AbstractServerPredicate getPredicate() {
+        return this.compositePredicate;
     }
 
     public Server choose(ILoadBalancer lb, Object key) {
@@ -42,7 +64,7 @@ public abstract class RoundRule extends PredicateBasedRule {
         int count = 0;
         while (count++ < 10) {
             List<Server> reachableServers = lb.getReachableServers();
-            List<Server> allServers = lb.getAllServers();
+            List<Server> allServers = getPredicate().getEligibleServers(lb.getAllServers(),key);
             int upCount = reachableServers.size();
             int serverCount = allServers.size();
 
@@ -61,6 +83,7 @@ public abstract class RoundRule extends PredicateBasedRule {
             }
 
             if (server.isAlive() && (server.isReadyToServe())) {
+                log.debug("[RoundRule]Choose Server ==> {} [MetaInfo:{}]",server.getId(), JSON.toJSONString(server.getMetaInfo()));
                 return (server);
             }
 
