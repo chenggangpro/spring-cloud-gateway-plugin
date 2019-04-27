@@ -3,7 +3,7 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
-## Current Version: 1.2.0.RELEASE
+## Current Version: 1.3.0.RELEASE
 
 ### This Plugin Support Below Features:
 
@@ -13,6 +13,7 @@ Spring Cloud Gateway Extra Plugin
 * [x] Add Global Exception Handler With Json
 * [x] Add Custom Exception Handler
 * [x] Add Grey Route With Ribbon
+* [x] Temporary Offline Endpoint
 
 ### How To Use This Feature
 
@@ -28,6 +29,7 @@ Spring Cloud Gateway Extra Plugin
 |1.0.0.RELEASE|Use Annotation To Enable plugin functions|
 |1.1.0.RELEASE|As V1.0.0.RELEASE,Change Read Form Data Method|
 |1.2.0.RELEASE|Simplify `@EnableGatewayPlugin`,Use Yaml Settings To Enable Plugin Functions|
+|1.3.0.RELEASE|Add Temporary Offline Endpoint ,Fix Grey Route Not Working Bug|
 
 ##### Step
 
