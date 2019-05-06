@@ -67,7 +67,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>1.2.0.RELEASE</version>
+        <version>1.3.0.RELEASE</version>
     </dependency>
     ```
   
@@ -145,7 +145,7 @@ Spring Cloud Gateway Extra Plugin
     }
     ```     
     
-    > 1.2.0.RELEASE Should use properties settings As Below to Choose which plugin function what you want to use.
+    > 1.2.0.RELEASE And Latest Version Should use properties settings As Below to Choose which plugin function what you want to use.
     
     ```yaml
     spring:
@@ -217,7 +217,7 @@ Spring Cloud Gateway Extra Plugin
                       - value5b
                       - value6b
     ```     
-    > 1.2.0.RELEASE Grey Rule Setting
+    > 1.2.0.RELEASE And Latest Version Grey Rule Setting
  
     ```yaml
     spring:
