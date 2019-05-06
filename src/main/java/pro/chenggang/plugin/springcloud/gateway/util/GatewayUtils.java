@@ -36,4 +36,15 @@ public class GatewayUtils {
         }
         return ip;
     }
+
+    /**
+     * get offline cache key
+     * @return
+     */
+    public static String getOfflineCacheKey(String ip,int port){
+        if(ip != null){
+            return ip+":"+port;
+        }
+        return null;
+    }
 }

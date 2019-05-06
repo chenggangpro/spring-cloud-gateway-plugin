@@ -3,7 +3,7 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
-## Current Version: 1.2.0.RELEASE
+## Current Version: 1.3.0.RELEASE
 
 ### This Plugin Support Below Features:
 
@@ -13,6 +13,7 @@ Spring Cloud Gateway Extra Plugin
 * [x] Add Global Exception Handler With Json
 * [x] Add Custom Exception Handler
 * [x] Add Grey Route With Ribbon
+* [x] Temporary Offline Endpoint
 
 ### How To Use This Feature
 
@@ -28,6 +29,7 @@ Spring Cloud Gateway Extra Plugin
 |1.0.0.RELEASE|Use Annotation To Enable plugin functions|
 |1.1.0.RELEASE|As V1.0.0.RELEASE,Change Read Form Data Method|
 |1.2.0.RELEASE|Simplify `@EnableGatewayPlugin`,Use Yaml Settings To Enable Plugin Functions|
+|1.3.0.RELEASE|Add Temporary Offline Endpoint ,Fix Grey Route Not Working Bug|
 
 ##### Step
 
@@ -65,7 +67,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>1.2.0.RELEASE</version>
+        <version>1.3.0.RELEASE</version>
     </dependency>
     ```
   
@@ -143,7 +145,7 @@ Spring Cloud Gateway Extra Plugin
     }
     ```     
     
-    > 1.2.0.RELEASE Should use properties settings As Below to Choose which plugin function what you want to use.
+    > 1.2.0.RELEASE And Latest Version Should use properties settings As Below to Choose which plugin function what you want to use.
     
     ```yaml
     spring:
@@ -215,7 +217,7 @@ Spring Cloud Gateway Extra Plugin
                       - value5b
                       - value6b
     ```     
-    > 1.2.0.RELEASE Grey Rule Setting
+    > 1.2.0.RELEASE And Latest Version Grey Rule Setting
  
     ```yaml
     spring:
@@ -296,3 +298,29 @@ Spring Cloud Gateway Extra Plugin
     }
     ```
 
+* 8 . Use Temporary Offline Endpoint
+
+    In some way, Our service need to restart or rebuild .If you use Eureka Discover Server, You know when your service are shutting down,
+    Eureka Server need time to notify all service that.This Endpoint support a rest api to temporary offline some service in 1 minute.
+    
+    The Rest Api Is :
+    
+    > Request Method: `Post`
+    
+    > Request URI: `/gateway/plugin/offline`
+    
+    > Request ContentType: `application/json`
+    
+    > Request Body:
+    
+    ```json
+    {
+      "name": "serviceId",
+      "ip": "serviceIp",
+      "port": "servicePort",
+      "offlineTime": "serviceOfflineTimestamp"
+    }
+    ```
+    
+    > Response Data:   `success` Or `data-empty-error`
+     

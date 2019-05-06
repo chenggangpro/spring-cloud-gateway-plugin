@@ -5,9 +5,7 @@ import com.netflix.client.config.IClientConfig;
 import com.netflix.client.config.IClientConfigKey;
 import com.netflix.loadbalancer.AbstractLoadBalancer;
 import com.netflix.loadbalancer.AbstractServerPredicate;
-import com.netflix.loadbalancer.AvailabilityPredicate;
 import com.netflix.loadbalancer.BaseLoadBalancer;
-import com.netflix.loadbalancer.CompositePredicate;
 import com.netflix.loadbalancer.ILoadBalancer;
 import com.netflix.loadbalancer.LoadBalancerStats;
 import com.netflix.loadbalancer.Server;
@@ -29,8 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @Slf4j
 public class GreyWeightResponseRule extends RoundRule {
-
-    private CompositePredicate compositePredicate;
 
     private static final IClientConfigKey<Integer> WEIGHT_TASK_TIMER_INTERVAL_CONFIG_KEY = new IClientConfigKey<Integer>() {
         @Override
@@ -71,19 +67,10 @@ public class GreyWeightResponseRule extends RoundRule {
 
     public GreyWeightResponseRule() {
         super();
-        GreyPredicate greyPredicate = new GreyPredicate();
-        AvailabilityPredicate availabilityPredicate = new AvailabilityPredicate(this,null);
-        compositePredicate = createCompositePredicate(greyPredicate, availabilityPredicate);
     }
 
-    private CompositePredicate createCompositePredicate(GreyPredicate p1, AvailabilityPredicate p2) {
-        return CompositePredicate.withPredicates(p1, p2).build();
-
-    }
-
-    @Override
-    public AbstractServerPredicate getPredicate() {
-        return this.compositePredicate;
+    public GreyWeightResponseRule(List<AbstractServerPredicate> customPredicateList) {
+        super(customPredicateList);
     }
 
     @Override
@@ -137,7 +124,7 @@ public class GreyWeightResponseRule extends RoundRule {
             if (Thread.interrupted()) {
                 return null;
             }
-            List<Server> allList = lb.getAllServers();
+            List<Server> allList = getPredicate().getEligibleServers(lb.getAllServers(),key);
 
             int serverCount = allList.size();
 
