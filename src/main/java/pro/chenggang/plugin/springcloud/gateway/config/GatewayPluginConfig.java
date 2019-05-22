@@ -1,12 +1,14 @@
 package pro.chenggang.plugin.springcloud.gateway.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pro.chenggang.plugin.springcloud.gateway.filter.GatewayContextFilter;
 import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
+import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
 
 /**
  * Gateway Plugin Config
@@ -24,8 +26,9 @@ public class GatewayPluginConfig {
     }
 
     @Bean
+    @ConditionalOnBean(GatewayPluginProperties.class)
     @ConditionalOnMissingBean(GatewayContextFilter.class)
-    @ConditionalOnProperty(prefix = GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX,value = "log-request",havingValue = "true")
+    @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "enable",havingValue = "true")
     public GatewayContextFilter gatewayContextFilter(GatewayPluginProperties gatewayPluginProperties){
         GatewayContextFilter gatewayContextFilter = new GatewayContextFilter(gatewayPluginProperties);
         log.debug("Load GatewayContextFilter Config Bean");
