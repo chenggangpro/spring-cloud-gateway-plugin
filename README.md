@@ -3,7 +3,7 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
-## Current Version: 1.3.1.RELEASE
+## Current Version: 1.3.2.RELEASE
 
 ### This Plugin Support Below Features:
 
@@ -19,7 +19,7 @@ Spring Cloud Gateway Extra Plugin
 
 ##### Note:
  
-   * This Dependency Base On SpringBoot[`2.1.5.RELEASE`] And Spring Cloud Gateway[`Greenwich.SR1`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
+   * This Dependency Base Spring Cloud Gateway[`Greenwich.SR1`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
    * This Dependency Is Now In Maven Central. 
    * The Feature To Read Request And Response Json Data Will Loss A Lot Of Performance,It Will Reduce The Gateway Traffic.
 
@@ -31,7 +31,7 @@ Spring Cloud Gateway Extra Plugin
 |1.1.0.RELEASE|As V1.0.0.RELEASE,Change Read Form Data Method|
 |1.2.0.RELEASE|Simplify `@EnableGatewayPlugin`,Use Yaml Settings To Enable Plugin Functions|
 |1.3.0.RELEASE|Add Temporary Offline Endpoint ,Fix Grey Route Not Working Bug|
-|1.3.1.RELEASE|Fix `Issue#10`,Enable GatewayContextFilter By Default|
+|1.3.2.RELEASE|Fix `Issue#10`,Enable GatewayContextFilter By Default|
 
 ##### Step
 
@@ -69,7 +69,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>1.3.1.RELEASE</version>
+        <version>1.3.2.RELEASE</version>
     </dependency>
     ```
   
