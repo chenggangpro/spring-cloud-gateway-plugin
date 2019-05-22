@@ -56,6 +56,8 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
         GatewayContext gatewayContext = new GatewayContext();
         gatewayContext.setReadRequestData(gatewayPluginProperties.getReadRequestData());
         gatewayContext.setReadResponseData(gatewayPluginProperties.getReadResponseData());
+        HttpHeaders headers = request.getHeaders();
+        gatewayContext.setRequestHeaders(headers);
         if(!gatewayContext.getReadRequestData()){
             exchange.getAttributes().put(GatewayContext.CACHE_GATEWAY_CONTEXT,gatewayContext);
             log.debug("[GatewayContext]Properties Set To Not Read Request Data");
@@ -66,8 +68,6 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
          * save gateway context into exchange
          */
         exchange.getAttributes().put(GatewayContext.CACHE_GATEWAY_CONTEXT,gatewayContext);
-        HttpHeaders headers = request.getHeaders();
-        gatewayContext.setRequestHeaders(headers);
         MediaType contentType = headers.getContentType();
         if(headers.getContentLength()>0){
             if(MediaType.APPLICATION_JSON.equals(contentType) || MediaType.APPLICATION_JSON_UTF8.equals(contentType)){
