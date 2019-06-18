@@ -3,6 +3,7 @@ package pro.chenggang.plugin.springcloud.gateway.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import pro.chenggang.plugin.springcloud.gateway.filter.GatewayContextFilter;
@@ -19,6 +20,7 @@ public class GatewayPluginConfig {
 
     @Bean
     @ConditionalOnMissingBean(GatewayPluginProperties.class)
+    @ConfigurationProperties(GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX)
     public GatewayPluginProperties gatewayPluginProperties(){
         return new GatewayPluginProperties();
     }

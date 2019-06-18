@@ -7,7 +7,6 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -21,7 +20,6 @@ import java.util.Map;
  */
 @Slf4j
 @ToString
-@ConfigurationProperties(GreyProperties.GREY_PROPERTIES_PREFIX)
 public class GreyProperties implements InitializingBean{
 
     public static final String GREY_PROPERTIES_PREFIX = "spring.cloud.gateway.plugin.grey";

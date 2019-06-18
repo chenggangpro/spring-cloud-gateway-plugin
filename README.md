@@ -158,27 +158,43 @@ Spring Cloud Gateway Extra Plugin
           plugin:
             config:
               log-request: true
-              read-request-data: true
+              read-request-data: true # this setting will read all request data
               read-response-data: true
               exception-json-handler: true
             grey:
               enable: false
               grey-ribbon-rule: weight_response
     ```
+* 4 . Specific Setting To Enable Read Request Data
 
-* 4 . User GatewayContext
+    ```yaml
+    spring:
+      cloud:
+        gateway:
+          plugin:
+            config:
+              read-request-data-service-id-list:  #set specific serviceId from discover to read request Data
+                - serviceId1
+                - serviceId2
+              read-request-data-path-list:        #set specific path to read request data
+                - /service/path1/*
+                - /service/path2/**
+                - /service/path3  
+    ```
+
+* 5 . User GatewayContext
 
     You Can Use GatewayContext To Get Cache JsonBody Or Form Body,Just Use
 
     ```java
     GatewayContext gatewayContext = exchange.getAttribute(GatewayContext.CACHE_GATEWAY_CONTEXT);
     ```
-* 5 . The Deference Between `GreyRibbonRule.DEFAULT` And `GreyRibbonRule.WeightResponse`
+* 6 . The Deference Between `GreyRibbonRule.DEFAULT` And `GreyRibbonRule.WeightResponse`
 
     The Default GreyRibbonRule Just Use Round Rule As Base Ribbon Rule
     The WeightResponse GreyRibbonRule Use WeightResponse Rule As Base Ribbon Rule
 
-* 6 . The Grey Route
+* 7 . The Grey Route
 
     * Setup Gateway Properties
     
@@ -275,7 +291,7 @@ Spring Cloud Gateway Extra Plugin
         The Route The Request To The Service Which Setup The MetaInfo With Specific Version Which Match The Gateway Grey Setup 
     
 
-* 7 . How To Custom GlobalException Handler With Json
+* 8 . How To Custom GlobalException Handler With Json
 
     In Order To Handle Other Exception,You Can Define Specific Bean Implements `ExceptionHandlerStrategy`
     By default,plugin supply `DefaultExceptionHandlerStrategy` In Case Of None Strategy Exist 
@@ -300,7 +316,7 @@ Spring Cloud Gateway Extra Plugin
     }
     ```
 
-* 8 . Use Temporary Offline Endpoint
+* 9 . Use Temporary Offline Endpoint
 
     In some way, Our service need to restart or rebuild .If you use Eureka Discover Server, You know when your service are shutting down,
     Eureka Server need time to notify all service that.This Endpoint support a rest api to temporary offline some service in 1 minute.

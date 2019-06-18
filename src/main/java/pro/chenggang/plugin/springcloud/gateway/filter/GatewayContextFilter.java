@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.cloud.gateway.route.Route;
 import org.springframework.cloud.gateway.support.BodyInserterContext;
 import org.springframework.cloud.gateway.support.CachedBodyOutputMessage;
+import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -15,6 +17,8 @@ import org.springframework.http.ReactiveHttpOutputMessage;
 import org.springframework.http.codec.HttpMessageReader;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -24,10 +28,12 @@ import org.springframework.web.server.ServerWebExchange;
 import pro.chenggang.plugin.springcloud.gateway.context.GatewayContext;
 import pro.chenggang.plugin.springcloud.gateway.option.FilterOrderEnum;
 import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
+import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +51,7 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
 
     private GatewayPluginProperties gatewayPluginProperties;
 
+    private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
     /**
      * default HttpMessageReader
      */
@@ -54,7 +61,7 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
         GatewayContext gatewayContext = new GatewayContext();
-        gatewayContext.setReadRequestData(gatewayPluginProperties.getReadRequestData());
+        gatewayContext.setReadRequestData(shouldReadRequestData(exchange));
         gatewayContext.setReadResponseData(gatewayPluginProperties.getReadResponseData());
         HttpHeaders headers = request.getHeaders();
         gatewayContext.setRequestHeaders(headers);
@@ -86,6 +93,45 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
     @Override
     public int getOrder() {
         return FilterOrderEnum.GATEWAY_CONTEXT_FILTER.getOrder();
+    }
+
+    /**
+     * check should read request data whether or not
+     * @return boolean
+     */
+    private boolean shouldReadRequestData(ServerWebExchange exchange){
+        if(gatewayPluginProperties.getReadRequestData()){
+            log.debug("[GatewayContext]Properties Set Read All Request Data");
+            return true;
+        }
+        List<String> readRequestDataServiceIdList = gatewayPluginProperties.getReadRequestDataServiceIdList();
+        List<String> readRequestDataPathList = gatewayPluginProperties.getReadRequestDataPathList();
+        if(!CollectionUtils.isEmpty(readRequestDataPathList)){
+            String requestPath = exchange.getRequest().getPath().pathWithinApplication().value();
+            for(String path : readRequestDataPathList){
+                if(antPathMatcher.match(path,requestPath)){
+                    log.debug("[GatewayContext]Properties Set Read Specific Request Data With Request Path:{},Math Pattern:{}",requestPath,path);
+                    return true;
+                }
+            }
+        }
+        Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
+        URI routeUri = route.getUri();
+        if(!"lb".equalsIgnoreCase(routeUri.getScheme())){
+            return false;
+        }
+        String routeServiceId = routeUri.getHost().toLowerCase();
+        if(!CollectionUtils.isEmpty(readRequestDataServiceIdList)){
+            if(readRequestDataServiceIdList.contains(routeServiceId)){
+                log.debug("[GatewayContext]Properties Set Read Specific Request Data With ServiceId:{}",routeServiceId);
+                return true;
+            }
+        }
+        if(GreyProperties.greyRuleMap.containsKey(routeServiceId)){
+            log.debug("[GatewayContext]Properties Set Read Specific Request Data With Grey ServiceId:{}",routeServiceId);
+            return true;
+        }
+        return false;
     }
 
     /**

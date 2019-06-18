@@ -3,6 +3,7 @@ package pro.chenggang.plugin.springcloud.gateway.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.gateway.config.LoadBalancerProperties;
 import org.springframework.cloud.gateway.filter.LoadBalancerClientFilter;
@@ -25,6 +26,7 @@ public class GreyRouteConfig {
 
     @Bean
     @ConditionalOnMissingBean(GreyProperties.class)
+    @ConfigurationProperties(GreyProperties.GREY_PROPERTIES_PREFIX)
     public GreyProperties greyProperties(){
         return new GreyProperties();
     }
