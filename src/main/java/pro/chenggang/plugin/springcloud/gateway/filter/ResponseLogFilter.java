@@ -48,8 +48,14 @@ public class ResponseLogFilter implements GlobalFilter, Ordered {
             public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
                 return DataBufferUtils.join(Flux.from(body))
                         .flatMap(dataBuffer -> {
-                            DataBufferUtils.retain(dataBuffer);
-                            final Flux<DataBuffer> cachedFlux = Flux.defer(() -> Flux.just(dataBuffer.slice(0, dataBuffer.readableByteCount())));
+                            byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                            dataBuffer.read(bytes);
+                            DataBufferUtils.release(dataBuffer);
+                            Flux<DataBuffer> cachedFlux = Flux.defer(() -> {
+                                DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+                                DataBufferUtils.retain(buffer);
+                                return Mono.just(buffer);
+                            });
                             BodyInserter<Flux<DataBuffer>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters.fromDataBuffers(cachedFlux);
                             CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, exchange.getResponse().getHeaders());
                             DefaultClientResponse clientResponse = new DefaultClientResponse(new ResponseAdapter(cachedFlux, exchange.getResponse().getHeaders()), ExchangeStrategies.withDefaults());

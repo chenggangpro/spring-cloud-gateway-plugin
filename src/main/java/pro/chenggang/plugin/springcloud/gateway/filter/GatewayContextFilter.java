@@ -230,8 +230,19 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
     private Mono<Void> readBody(ServerWebExchange exchange,GatewayFilterChain chain,GatewayContext gatewayContext){
         return DataBufferUtils.join(exchange.getRequest().getBody())
                 .flatMap(dataBuffer -> {
-                    DataBufferUtils.retain(dataBuffer);
-                    Flux<DataBuffer> cachedFlux = Flux.defer(() -> Flux.just(dataBuffer.slice(0, dataBuffer.readableByteCount())));
+                    /*
+                     * read the body Flux<DataBuffer>, and release the buffer
+                     * //TODO when SpringCloudGateway Version Release To G.SR2,this can be update with the new version's feature
+                     * see PR https://github.com/spring-cloud/spring-cloud-gateway/pull/1095
+                     */
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+                    Flux<DataBuffer> cachedFlux = Flux.defer(() -> {
+                        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+                        DataBufferUtils.retain(buffer);
+                        return Mono.just(buffer);
+                    });
                     /*
                      * repackage ServerHttpRequest
                      */
