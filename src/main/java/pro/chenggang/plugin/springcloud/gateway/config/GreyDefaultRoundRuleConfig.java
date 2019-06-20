@@ -1,7 +1,6 @@
 package pro.chenggang.plugin.springcloud.gateway.config;
 
 import com.netflix.loadbalancer.IRule;
-import com.netflix.niws.loadbalancer.DiscoveryEnabledNIWSServerList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -25,7 +24,7 @@ import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(DiscoveryEnabledNIWSServerList.class)
+@ConditionalOnClass(RibbonClientConfiguration.class)
 @AutoConfigureBefore(RibbonClientConfiguration.class)
 public class GreyDefaultRoundRuleConfig {
 
