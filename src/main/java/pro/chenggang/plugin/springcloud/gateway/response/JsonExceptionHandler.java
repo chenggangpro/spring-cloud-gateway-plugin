@@ -82,7 +82,7 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
          * get strategy
          */
         ExceptionHandlerStrategy strategy = exceptionHandlerStrategyFactory.getStrategy(ex.getClass());
-        ExceptionHandlerResult result = strategy.handleException(ex);
+        ExceptionHandlerResult result = strategy.handleException(exchange,ex);
         /*
          * log error
          */

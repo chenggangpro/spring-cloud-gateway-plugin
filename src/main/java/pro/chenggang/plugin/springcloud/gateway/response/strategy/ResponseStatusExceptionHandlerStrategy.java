@@ -3,6 +3,7 @@ package pro.chenggang.plugin.springcloud.gateway.response.strategy;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebExchange;
 import pro.chenggang.plugin.springcloud.gateway.option.ResponseResult;
 import pro.chenggang.plugin.springcloud.gateway.option.SystemResponseInfo;
 import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
@@ -21,7 +22,7 @@ public class ResponseStatusExceptionHandlerStrategy implements ExceptionHandlerS
     }
 
     @Override
-    public ExceptionHandlerResult handleException(Throwable throwable) {
+    public ExceptionHandlerResult handleException(ServerWebExchange exchange, Throwable throwable) {
         ResponseStatusException responseStatusException = (ResponseStatusException) throwable;
         ResponseResult<String> responseResult = new ResponseResult<>(SystemResponseInfo.SERVICE_NOT_AVAILABLE,throwable.getMessage());
         String response = JSON.toJSONString(responseResult);

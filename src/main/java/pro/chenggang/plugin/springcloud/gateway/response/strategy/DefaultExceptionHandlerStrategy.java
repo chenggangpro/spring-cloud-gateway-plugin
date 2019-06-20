@@ -3,6 +3,7 @@ package pro.chenggang.plugin.springcloud.gateway.response.strategy;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ServerWebExchange;
 import pro.chenggang.plugin.springcloud.gateway.option.ResponseResult;
 import pro.chenggang.plugin.springcloud.gateway.option.SystemResponseInfo;
 import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
@@ -21,7 +22,7 @@ public class DefaultExceptionHandlerStrategy implements ExceptionHandlerStrategy
     }
 
     @Override
-    public ExceptionHandlerResult handleException(Throwable throwable) {
+    public ExceptionHandlerResult handleException(ServerWebExchange exchange, Throwable throwable) {
         ResponseResult<String> responseResult = new ResponseResult<>(SystemResponseInfo.GATEWAY_ERROR,throwable.getMessage());
         ExceptionHandlerResult result = new ExceptionHandlerResult(HttpStatus.INTERNAL_SERVER_ERROR, JSON.toJSONString(responseResult));
         log.debug("[DefaultExceptionHandlerStrategy]Handle Exception:{},Result:{}",throwable.getMessage(),result);

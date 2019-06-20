@@ -5,15 +5,16 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
+import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerStrategyMethodProcessor;
 import pro.chenggang.plugin.springcloud.gateway.response.JsonExceptionHandler;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.DefaultExceptionHandlerStrategyFactory;
 import pro.chenggang.plugin.springcloud.gateway.response.factory.ExceptionHandlerStrategyFactory;
@@ -21,7 +22,6 @@ import pro.chenggang.plugin.springcloud.gateway.response.strategy.ExceptionHandl
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Gateway Plugin Config
@@ -30,22 +30,20 @@ import java.util.Map;
  */
 @Slf4j
 @Configuration
+@Import(ExceptionHandlerStrategyMethodProcessor.class)
 @ConditionalOnProperty(prefix = GatewayPluginProperties.GATEWAY_PLUGIN_PROPERTIES_PREFIX,value = "exception-json-handler",havingValue = "true")
 public class GlobalExceptionJsonHandlerConfig {
 
     /**
      * ExceptionHandlerStrategyFactory
-     * @param applicationContext
+     * @param exceptionHandlerStrategyList
      * @return
      */
     @Bean
     @ConditionalOnMissingBean(ExceptionHandlerStrategyFactory.class)
-    public ExceptionHandlerStrategyFactory exceptionHandlerStrategyFactory(ApplicationContext applicationContext){
+    public ExceptionHandlerStrategyFactory exceptionHandlerStrategyFactory(List<ExceptionHandlerStrategy> exceptionHandlerStrategyList){
         DefaultExceptionHandlerStrategyFactory factory = new DefaultExceptionHandlerStrategyFactory();
-        Map<String, ExceptionHandlerStrategy> exceptionHandlerStrategyMap = applicationContext.getBeansOfType(ExceptionHandlerStrategy.class);
-        if(null != exceptionHandlerStrategyMap && !exceptionHandlerStrategyMap.isEmpty()){
-            exceptionHandlerStrategyMap.forEach((k,v)->factory.addStrategy(v));
-        }
+        exceptionHandlerStrategyList.forEach(item->factory.addStrategy(item));
         log.debug("Load ExceptionHandler Strategy Factory Config Bean");
         return factory;
     }

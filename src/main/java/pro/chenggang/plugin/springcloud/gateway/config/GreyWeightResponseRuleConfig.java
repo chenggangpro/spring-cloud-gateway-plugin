@@ -24,7 +24,7 @@ import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
  */
 @Slf4j
 @Configuration
-@ConditionalOnClass(DiscoveryEnabledNIWSServerList.class)
+@ConditionalOnClass({RibbonClientConfiguration.class, DiscoveryEnabledNIWSServerList.class})
 @AutoConfigureBefore(RibbonClientConfiguration.class)
 @ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "enable",havingValue = "true")
 public class GreyWeightResponseRuleConfig {

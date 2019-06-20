@@ -1,6 +1,7 @@
 package pro.chenggang.plugin.springcloud.gateway.response.strategy;
 
 
+import org.springframework.web.server.ServerWebExchange;
 import pro.chenggang.plugin.springcloud.gateway.response.ExceptionHandlerResult;
 
 /**
@@ -19,8 +20,9 @@ public interface ExceptionHandlerStrategy<T extends Throwable> {
     /**
      * Handle Exception
      * @param throwable
+     * @param exchange
      * @return ExceptionHandlerResult
      */
-    ExceptionHandlerResult handleException(Throwable throwable);
+    ExceptionHandlerResult handleException(ServerWebExchange exchange, Throwable throwable);
 
 }
