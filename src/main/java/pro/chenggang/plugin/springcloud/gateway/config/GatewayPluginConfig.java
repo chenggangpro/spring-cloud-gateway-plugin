@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.DispatcherHandler;
 import pro.chenggang.plugin.springcloud.gateway.filter.GatewayContextFilter;
+import pro.chenggang.plugin.springcloud.gateway.filter.RemoveGatewayContextFilter;
 import pro.chenggang.plugin.springcloud.gateway.filter.factory.RouteHystrixGatewayFilterFactory;
 import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
 import rx.RxReactiveStreams;
@@ -37,6 +38,15 @@ public class GatewayPluginConfig {
     public GatewayContextFilter gatewayContextFilter(GatewayPluginProperties gatewayPluginProperties){
         GatewayContextFilter gatewayContextFilter = new GatewayContextFilter(gatewayPluginProperties);
         log.debug("Load GatewayContextFilter Config Bean");
+        return gatewayContextFilter;
+    }
+
+    @Bean
+    @ConditionalOnBean(GatewayPluginProperties.class)
+    @ConditionalOnMissingBean(RemoveGatewayContextFilter.class)
+    public RemoveGatewayContextFilter removeGatewayContextFilter(){
+        RemoveGatewayContextFilter gatewayContextFilter = new RemoveGatewayContextFilter();
+        log.debug("Load RemoveGatewayContextFilter Config Bean");
         return gatewayContextFilter;
     }
 
