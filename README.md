@@ -3,7 +3,7 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
-## Current Version: 1.3.2.RELEASE
+## Current Version: 2.1.SR1.1.RELEASE
 
 ### This Plugin Support Below Features:
 
@@ -13,7 +13,7 @@ Spring Cloud Gateway Extra Plugin
 * [x] Add Global Exception Handler With Json
 * [x] Add Custom Exception Handler
 * [x] Add Grey Route With Ribbon
-* [x] Temporary Offline Endpoint
+* [x] Each Route Use different Hystrix CommandKey 
 
 ### How To Use This Feature
 
@@ -45,6 +45,7 @@ Spring Cloud Gateway Extra Plugin
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
+        <!--If you need to use grey route,you should add next dependency ,but grey route only can be used with eureka discover-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -69,7 +70,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>1.3.2.RELEASE</version>
+        <version>2.1.SR1.RELEASE</version>
     </dependency>
     ```
   
@@ -98,54 +99,6 @@ Spring Cloud Gateway Extra Plugin
 
     By use this annotation `@EnableGatewayPlugin` to enable the plugin,the plugin support switch to choose feature
     By default,the `GatewayContext Filter` is always into system
-    
-    > 1.0.0.RELEASE,1.1.0.RELEASE Should use annotation method As Below to Choose which plugin function what you want to use.
-    
-    ```java
-    public @interface EnableGatewayPlugin {
-    
-        /**
-         * enable request log plugin
-         * default true
-         * @return
-         */
-        boolean enableRequestLog() default true;
-    
-        /**
-         * enable grey route plugin
-         * default false
-         * @return
-         */
-        boolean enableGreyRoute() default false;
-    
-        /**
-         * grey ribbon Rule
-         * @return
-         */
-        GreyRibbonRule greyRibbonRule() default GreyRibbonRule.DEFAULT;
-    
-        /**
-         * enable json  global exception handler
-         * default true
-         * @return
-         */
-        boolean enableGlobalExceptionJsonHandler() default true;
-    
-        /**
-         * RreyRule
-         */
-        enum GreyRibbonRule{
-            /**
-             * default grey rule based on  round rule
-             */
-            DEFAULT,
-            /**
-             * weight response rule base on WeightResponseRUle
-             */
-            WeightResponse,
-        }
-    }
-    ```     
     
     > 1.2.0.RELEASE And Latest Version Should use properties settings As Below to Choose which plugin function what you want to use.
     
@@ -197,44 +150,7 @@ Spring Cloud Gateway Extra Plugin
 * 7 . The Grey Route
 
     * Setup Gateway Properties
-    
-    > 1.0.0.RELEASE,1.1.0.RELEASE Grey Rule Setting
-    
-    ```yaml
-    spring:
-      cloud:
-        gateway:
-          grey:
-            greyRuleList:
-              - serviceId: privider1
-                version: 2.0.0
-                operation: OR
-                rules:
-                  - key: key1
-                    value:
-                      - value1
-                      - value2
-                      - value3
-                  - key: key2
-                    value:
-                      - value4
-                      - value5
-                      - value6
-              - serviceId: provider2
-                version: 2.0.0
-                operation: AND
-                rules:
-                  - key: keya
-                    value:
-                      - value1a
-                      - value2a
-                      - value3a
-                  - key: keyb
-                    value:
-                      - value4b
-                      - value5b
-                      - value6b
-    ```     
+     
     > 1.2.0.RELEASE And Latest Version Grey Rule Setting
  
     ```yaml
@@ -315,30 +231,33 @@ Spring Cloud Gateway Extra Plugin
         }
     }
     ```
-
-* 9 . Use Temporary Offline Endpoint
-
-    In some way, Our service need to restart or rebuild .If you use Eureka Discover Server, You know when your service are shutting down,
-    Eureka Server need time to notify all service that.This Endpoint support a rest api to temporary offline some service in 1 minute.
     
-    The Rest Api Is :
+    Or You Can Use `@ExceptionHandler` just like below,
     
-    > Request Method: `Post`
+    The`@ResponseStatus` is optional,if you don't add `@ResponseStatus`,the default HttpStatus is HttpStatus.BAD_GATEWAY 
     
-    > Request URI: `/gateway/plugin/offline`
+    ```java
+    @Component
+    public class DemoExceptionHandler {
     
-    > Request ContentType: `application/json`
-    
-    > Request Body:
-    
-    ```json
-    {
-      "name": "serviceId",
-      "ip": "serviceIp",
-      "port": "servicePort",
-      "offlineTime": "serviceOfflineTimestamp"
+        @ExceptionHandler({NotFoundException.class})
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public Map handlerException(ServerWebExchange exchange,TimeoutException throwable){
+            LinkedHashSet<URI> originalRequestUris = exchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR,null);
+            Map map = Maps.newHashMapWithExpectedSize(2);
+            map.put("URI",originalRequestUris);
+            map.put("ExceptionMessage",throwable.getClass().getSimpleName());
+            return map;
+        }
+      
+        @ExceptionHandler({ClientException.class, TimeoutException.class})
+        @ResponseStatus(HttpStatus.BAD_GATEWAY)
+        public Map handlerException(ServerWebExchange exchange,TimeoutException throwable){
+              LinkedHashSet<URI> originalRequestUris = exchange.getAttributeOrDefault(ServerWebExchangeUtils.GATEWAY_ORIGINAL_REQUEST_URL_ATTR,null);
+              Map map = Maps.newHashMapWithExpectedSize(2);
+              map.put("URI",originalRequestUris);
+              map.put("ExceptionMessage",throwable.getClass().getSimpleName());
+              return map;
+        }
     }
     ```
-    
-    > Response Data:   `success` Or `data-empty-error`
-     
