@@ -5,6 +5,8 @@ Spring Cloud Gateway Extra Plugin
 
 ## Current Version: 2.1.SR1.1.RELEASE
 
+> More Detail See [Wiki](https://github.com/chenggangpro/spring-cloud-gateway-plugin/wiki)
+
 ### This Plugin Support Below Features:
 
 * [x] Cache Request Body And Form Body
