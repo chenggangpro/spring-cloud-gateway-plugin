@@ -91,8 +91,6 @@ Spring Cloud Gateway Extra Plugin
     By use this annotation `@EnableGatewayPlugin` to enable the plugin,the plugin support switch to choose feature
     By default,the `GatewayContext Filter` is always into system
     
-    > 1.2.0.RELEASE And Latest Version Should use properties settings As Below to Choose which plugin function what you want to use.
-    
     ```yaml
     spring:
       profiles:
@@ -141,8 +139,6 @@ Spring Cloud Gateway Extra Plugin
 * 7 . The Grey Route
 
     * Setup Gateway Properties
-     
-    > 1.2.0.RELEASE And Latest Version Grey Rule Setting
  
     ```yaml
     spring:
