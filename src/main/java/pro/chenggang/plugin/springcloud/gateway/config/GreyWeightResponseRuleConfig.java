@@ -14,8 +14,9 @@ import org.springframework.context.annotation.Scope;
 import pro.chenggang.plugin.springcloud.gateway.grey.GreyPredicate;
 import pro.chenggang.plugin.springcloud.gateway.grey.GreyWeightResponseRule;
 import pro.chenggang.plugin.springcloud.gateway.grey.support.PredicateFactory;
-import pro.chenggang.plugin.springcloud.gateway.offline.OfflinePredicate;
 import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
+
+import java.util.Collections;
 
 /**
  * Gateway Plugin Config
@@ -26,7 +27,6 @@ import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
 @Configuration
 @ConditionalOnClass({RibbonClientConfiguration.class, DiscoveryEnabledNIWSServerList.class})
 @AutoConfigureBefore(RibbonClientConfiguration.class)
-@ConditionalOnProperty(prefix = GreyProperties.GREY_PROPERTIES_PREFIX,value = "enable",havingValue = "true")
 public class GreyWeightResponseRuleConfig {
 
     @Bean
@@ -35,9 +35,9 @@ public class GreyWeightResponseRuleConfig {
     public IRule ribbonRule(PredicateFactory predicateFactory, GreyProperties greyProperties) {
         GreyWeightResponseRule greyWeightResponseRule;
         if(greyProperties.getEnable()){
-            greyWeightResponseRule = new GreyWeightResponseRule(predicateFactory.getAllPredicate(GreyPredicate.class,OfflinePredicate.class));
+            greyWeightResponseRule = new GreyWeightResponseRule(predicateFactory.getAllPredicate(GreyPredicate.class));
         }else{
-            greyWeightResponseRule = new GreyWeightResponseRule(predicateFactory.getAllPredicate(OfflinePredicate.class));
+            greyWeightResponseRule = new GreyWeightResponseRule(Collections.emptyList());
         }
         log.debug("Load Grey Weight Response Rule Config Bean");
         return greyWeightResponseRule;

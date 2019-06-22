@@ -15,8 +15,9 @@ import org.springframework.context.annotation.Scope;
 import pro.chenggang.plugin.springcloud.gateway.grey.GreyDefaultRoundRule;
 import pro.chenggang.plugin.springcloud.gateway.grey.GreyPredicate;
 import pro.chenggang.plugin.springcloud.gateway.grey.support.PredicateFactory;
-import pro.chenggang.plugin.springcloud.gateway.offline.OfflinePredicate;
 import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
+
+import java.util.Collections;
 
 /**
  * Gateway Plugin Config
@@ -34,7 +35,6 @@ public class GreyDefaultRoundRuleConfig {
     public PredicateFactory predicateFactory(){
         PredicateFactory predicateFactory = new PredicateFactory();
         predicateFactory.putPredicateInitWorker(GreyPredicate.class, GreyPredicate::new);
-        predicateFactory.putPredicateInitWorker(OfflinePredicate.class, OfflinePredicate::new);
         log.debug("Load Predicate Factory Success");
         return predicateFactory;
     }
@@ -45,9 +45,9 @@ public class GreyDefaultRoundRuleConfig {
     public IRule ribbonRule(PredicateFactory predicateFactory,GreyProperties greyProperties) {
         GreyDefaultRoundRule greyDefaultRoundRule ;
         if(greyProperties.getEnable()){
-            greyDefaultRoundRule = new GreyDefaultRoundRule(predicateFactory.getAllPredicate(GreyPredicate.class,OfflinePredicate.class));
+            greyDefaultRoundRule = new GreyDefaultRoundRule(predicateFactory.getAllPredicate(GreyPredicate.class));
         }else{
-            greyDefaultRoundRule = new GreyDefaultRoundRule(predicateFactory.getAllPredicate(OfflinePredicate.class));
+            greyDefaultRoundRule = new GreyDefaultRoundRule(Collections.emptyList());
         }
         log.debug("Load Grey Default Round Rule Config Bean");
         return greyDefaultRoundRule;
