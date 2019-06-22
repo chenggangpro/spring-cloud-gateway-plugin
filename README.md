@@ -20,18 +20,9 @@ Spring Cloud Gateway Extra Plugin
 ##### Note:
  
    * This Dependency Base Spring Cloud Gateway[`Greenwich.SR1`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
+   * The SpringBoot Version need to update to [`2.1.6.RELEASE`],It fix reactor-netty issues
    * This Dependency Is Now In Maven Central. 
    * The Feature To Read Request And Response Json Data Will Loss A Lot Of Performance,It Will Reduce The Gateway Traffic.
-
-###### Change Log
-
-|Version|Note|
-|:-----:|:--------|
-|1.0.0.RELEASE|Use Annotation To Enable plugin functions|
-|1.1.0.RELEASE|As V1.0.0.RELEASE,Change Read Form Data Method|
-|1.2.0.RELEASE|Simplify `@EnableGatewayPlugin`,Use Yaml Settings To Enable Plugin Functions|
-|1.3.0.RELEASE|Add Temporary Offline Endpoint ,Fix Grey Route Not Working Bug|
-|1.3.2.RELEASE|Fix `Issue#10`,Enable GatewayContextFilter By Default|
 
 ##### Step
 
