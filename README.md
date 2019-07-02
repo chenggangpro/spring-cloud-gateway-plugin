@@ -63,7 +63,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>2.1.SR1.RELEASE</version>
+        <version>2.1.SR1.1.RELEASE</version>
     </dependency>
     ```
   
