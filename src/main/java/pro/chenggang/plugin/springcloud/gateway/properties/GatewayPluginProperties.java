@@ -40,6 +40,10 @@ public class GatewayPluginProperties implements InitializingBean {
      */
     private Boolean exceptionJsonHandler = false;
     /**
+     * Enable Or Disable Dynamic Route
+     */
+    private Boolean enableDynamicRoute = false;
+    /**
      * Enable Read Request Data When use discover route by serviceId
      */
     private List<String> readRequestDataServiceIdList = Collections.emptyList();
