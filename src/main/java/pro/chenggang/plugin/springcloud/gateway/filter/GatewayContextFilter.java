@@ -51,11 +51,11 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
 
     private GatewayPluginProperties gatewayPluginProperties;
 
-    private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
+    private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
     /**
      * default HttpMessageReader
      */
-    private static final List<HttpMessageReader<?>> messageReaders = HandlerStrategies.withDefaults().messageReaders();
+    private static final List<HttpMessageReader<?>> MESSAGE_READERS = HandlerStrategies.withDefaults().messageReaders();
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -109,7 +109,7 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
         if(!CollectionUtils.isEmpty(readRequestDataPathList)){
             String requestPath = exchange.getRequest().getPath().pathWithinApplication().value();
             for(String path : readRequestDataPathList){
-                if(antPathMatcher.match(path,requestPath)){
+                if(ANT_PATH_MATCHER.match(path,requestPath)){
                     log.debug("[GatewayContext]Properties Set Read Specific Request Data With Request Path:{},Math Pattern:{}",requestPath,path);
                     return true;
                 }
@@ -253,7 +253,7 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
                         }
                     };
                     ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-                    return ServerRequest.create(mutatedExchange, messageReaders)
+                    return ServerRequest.create(mutatedExchange, MESSAGE_READERS)
                             .bodyToMono(String.class)
                             .doOnNext(objectValue -> {
                                 gatewayContext.setRequestBody(objectValue);
