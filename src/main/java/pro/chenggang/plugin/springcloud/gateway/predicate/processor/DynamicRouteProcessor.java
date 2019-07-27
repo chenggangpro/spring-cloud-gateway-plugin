@@ -9,7 +9,7 @@ import pro.chenggang.plugin.springcloud.gateway.predicate.support.PreprocessResu
 import java.util.Optional;
 
 /**
- * Pre process ServerWebExchange for dynamic route predicate
+ * Process ServerWebExchange for dynamic route predicate
  * @author chenggang
  * @date 2019/07/17
  */
@@ -18,21 +18,21 @@ public interface DynamicRouteProcessor<T> {
     /**
      * preprocess action
      * @param exchange ServerWebExchange
-     * @return process Result
+     * @return process Result ,if result is Optional.empty(),then dynamic predicate not working
      */
     Optional<PreprocessResult<T>> preprocess(ServerWebExchange exchange);
 
     /**
      * process to unify config for predicate
-     * @param preprocessResult
-     * @param route
+     * @param preprocessResult pre process result
+     * @param route current route
      * @return
      */
     Optional<DynamicRouteConfig> processConfig(PreprocessResult<T> preprocessResult, Route route);
 
     /**
      * target predicate bean 's class
-     * @return
+     * @return RoutePredicateFactory Class
      */
     Optional<Class< ? extends AbstractRoutePredicateFactory>> targetPredicateBeanClass();
 }
