@@ -3,7 +3,7 @@ Spring Cloud Gateway Extra Plugin
 
 [![Build Status](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin.svg?branch=master)](https://travis-ci.com/chenggangpro/spring-cloud-gateway-plugin)
 
-## Current Version: 2.1.SR1.1.RELEASE
+## Current Version: 2.1.SR2.1.RELEASE
 
 
 |Gateway Version|Plugin Version|
@@ -29,7 +29,7 @@ Spring Cloud Gateway Extra Plugin
 
 ##### Note:
  
-   * This Dependency Base Spring Cloud Gateway[`Greenwich.SR1`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
+   * This Dependency Base Spring Cloud Gateway[`Greenwich.SR2`],Suggest To Update To This SpringCloud Version,Official Resolve Some Issues , Fix Some Bugs.
    * The SpringBoot Version need to update to [`2.1.6.RELEASE`],It fix reactor-netty issues
    * This Dependency Is Now In Maven Central. 
    * The Feature To Read Request And Response Json Data Will Loss A Lot Of Performance,It Will Reduce The Gateway Traffic.
@@ -58,7 +58,7 @@ Spring Cloud Gateway Extra Plugin
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Greenwich.SR1</version>
+                <version>Greenwich.SR2</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -71,7 +71,7 @@ Spring Cloud Gateway Extra Plugin
     <dependency>
         <groupId>pro.chenggang</groupId>
         <artifactId>spring-cloud-gateway-plugin</artifactId>
-        <version>2.1.SR1.1.RELEASE</version>
+        <version>2.1.SR2.1.RELEASE</version>
     </dependency>
     ```
   
