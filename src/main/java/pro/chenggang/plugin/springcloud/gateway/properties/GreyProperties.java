@@ -24,7 +24,7 @@ public class GreyProperties implements InitializingBean{
 
     public static final String GREY_PROPERTIES_PREFIX = "spring.cloud.gateway.plugin.grey";
 
-    public static Map<String,GreyRule> greyRuleMap;
+    public static Map<String,GreyRule> greyRuleMap = Collections.emptyMap();
     /**
      * Enable Grey Route
      */
