@@ -37,7 +37,7 @@ public class GatewayPluginConfig {
     @Bean
     @ConditionalOnBean(GatewayPluginProperties.class)
     @ConditionalOnMissingBean(GatewayContextFilter.class)
-    public GatewayContextFilter gatewayContextFilter(GatewayPluginProperties gatewayPluginProperties , @Autowired(required = false) ContextExtraDataGenerator contextExtraDataGenerator){
+    public GatewayContextFilter gatewayContextFilter(@Autowired GatewayPluginProperties gatewayPluginProperties , @Autowired(required = false) ContextExtraDataGenerator contextExtraDataGenerator){
         GatewayContextFilter gatewayContextFilter = new GatewayContextFilter(gatewayPluginProperties,contextExtraDataGenerator);
         log.debug("Load GatewayContextFilter Config Bean");
         return gatewayContextFilter;
