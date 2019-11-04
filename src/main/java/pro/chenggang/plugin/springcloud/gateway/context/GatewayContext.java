@@ -21,30 +21,35 @@ public class GatewayContext {
     /**
      * whether read request data
      */
-    private Boolean readRequestData = false;
+    protected Boolean readRequestData = false;
     /**
      * whether read response data
      */
-    private Boolean readResponseData = false;
+    protected Boolean readResponseData = false;
     /**
      * cache json body
      */
-    private String requestBody;
+    protected String requestBody;
     /**
      * cache Response Body
      */
-    private Object responseBody;
+    protected Object responseBody;
     /**
      * request headers
      */
-    private HttpHeaders requestHeaders;
+    protected HttpHeaders requestHeaders;
     /**
      * cache form data
      */
-    private MultiValueMap<String, String> formData;
+    protected MultiValueMap<String, String> formData;
     /**
      * cache all request data include:form data and query param
      */
-    private MultiValueMap<String, String> allRequestData = new LinkedMultiValueMap<>(0);
+    protected MultiValueMap<String, String> allRequestData = new LinkedMultiValueMap<>(0);
+
+    /**
+     * Gateway Extra Data
+     */
+    protected GatewayContextExtraData gatewayContextExtraData;
 
 }
