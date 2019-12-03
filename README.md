@@ -8,8 +8,8 @@ Spring Cloud Gateway Extra Plugin
 
 |Gateway Version|Plugin Version|
 |:--|:--|
-|`Greenwich.SR1`|`2.1.SR1.2.RELEASE`|
-|`Greenwich.SR2`|`2.1.SR2.1.RELEASE`|
+|`Greenwich.SR1`|`2.1.SR1.3.RELEASE`|
+|`Greenwich.SR2`|`2.1.SR2.2.RELEASE`|
 
 
 > More Detail See [Wiki](https://github.com/chenggangpro/spring-cloud-gateway-plugin/wiki)
