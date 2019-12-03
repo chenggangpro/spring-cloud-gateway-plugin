@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.1.6.RELEASE</version>
+		<version>2.1.10.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>pro.chenggang</groupId>
 	<artifactId>spring-cloud-gateway-plugin</artifactId>
-	<version>2.1.SR1.2.RELEASE</version>
+	<version>2.1.SR2.2.RELEASE</version>
 	<packaging>jar</packaging>
 
 	<name>spring-cloud-gateway-plugin</name>
@@ -28,7 +28,7 @@
 	</licenses>
 
 	<scm>
-		<tag>2.1.SR1.2.RELEASE</tag>
+		<tag>2.1.SR2.2.RELEASE</tag>
 		<url>git@github.com:chenggangpro/spring-cloud-gateway-plugin.git</url>
 		<connection>scm:git:git@github.com:chenggangpro/spring-cloud-gateway-plugin.git</connection>
 		<developerConnection>scm:git:git@github.com:chenggangpro/spring-cloud-gateway-plugin.git</developerConnection>
