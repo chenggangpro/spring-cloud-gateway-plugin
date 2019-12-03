@@ -60,7 +60,7 @@ public class ResponseLogFilter implements GlobalFilter, Ordered {
                             });
                             BodyInserter<Flux<DataBuffer>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters.fromDataBuffers(cachedFlux);
                             CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, exchange.getResponse().getHeaders());
-                            DefaultClientResponse clientResponse = new DefaultClientResponse(new ResponseAdapter(cachedFlux, exchange.getResponse().getHeaders()), ExchangeStrategies.withDefaults());
+                            DefaultClientResponse clientResponse = new DefaultClientResponse(new ResponseAdapter(cachedFlux, exchange.getResponse().getHeaders()), ExchangeStrategies.withDefaults(),"");
                             Optional<MediaType> optionalMediaType = clientResponse.headers().contentType();
                             if(!optionalMediaType.isPresent()){
                                 log.debug("[ResponseLogFilter]Response ContentType Is Not Exist");
