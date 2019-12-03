@@ -24,8 +24,10 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
+import pro.chenggang.plugin.springcloud.gateway.context.ContextExtraDataGenerator;
 import pro.chenggang.plugin.springcloud.gateway.context.GatewayContext;
 import pro.chenggang.plugin.springcloud.gateway.filter.support.CachedBodyOutputMessage;
+import pro.chenggang.plugin.springcloud.gateway.context.GatewayContextExtraData;
 import pro.chenggang.plugin.springcloud.gateway.option.FilterOrderEnum;
 import pro.chenggang.plugin.springcloud.gateway.properties.GatewayPluginProperties;
 import pro.chenggang.plugin.springcloud.gateway.properties.GreyProperties;
@@ -39,6 +41,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Gateway Context Filter
@@ -50,6 +53,8 @@ import java.util.Map;
 public class GatewayContextFilter implements GlobalFilter, Ordered {
 
     private GatewayPluginProperties gatewayPluginProperties;
+
+    private ContextExtraDataGenerator contextExtraDataGenerator;
 
     private static final AntPathMatcher ANT_PATH_MATCHER = new AntPathMatcher();
     /**
@@ -65,6 +70,10 @@ public class GatewayContextFilter implements GlobalFilter, Ordered {
         gatewayContext.setReadResponseData(gatewayPluginProperties.getReadResponseData());
         HttpHeaders headers = request.getHeaders();
         gatewayContext.setRequestHeaders(headers);
+        if(Objects.nonNull(contextExtraDataGenerator)){
+            GatewayContextExtraData gatewayContextExtraData = contextExtraDataGenerator.generateContextExtraData(exchange);
+            gatewayContext.setGatewayContextExtraData(gatewayContextExtraData);
+        }
         if(!gatewayContext.getReadRequestData()){
             exchange.getAttributes().put(GatewayContext.CACHE_GATEWAY_CONTEXT,gatewayContext);
             log.debug("[GatewayContext]Properties Set To Not Read Request Data");

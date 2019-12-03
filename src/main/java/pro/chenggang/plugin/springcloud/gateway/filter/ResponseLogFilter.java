@@ -27,6 +27,8 @@ import pro.chenggang.plugin.springcloud.gateway.option.FilterOrderEnum;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 /**
  * @classDesc:
  * @author: chenggang
@@ -58,8 +60,21 @@ public class ResponseLogFilter implements GlobalFilter, Ordered {
                             });
                             BodyInserter<Flux<DataBuffer>, ReactiveHttpOutputMessage> bodyInserter = BodyInserters.fromDataBuffers(cachedFlux);
                             CachedBodyOutputMessage outputMessage = new CachedBodyOutputMessage(exchange, exchange.getResponse().getHeaders());
-                            DefaultClientResponse clientResponse = new DefaultClientResponse(new ResponseAdapter(cachedFlux, exchange.getResponse().getHeaders()), ExchangeStrategies.withDefaults(),"");
-                            MediaType contentType = clientResponse.headers().contentType().orElse(MediaType.APPLICATION_OCTET_STREAM);
+                            DefaultClientResponse clientResponse = new DefaultClientResponse(new ResponseAdapter(cachedFlux, exchange.getResponse().getHeaders()), ExchangeStrategies.withDefaults());
+                            Optional<MediaType> optionalMediaType = clientResponse.headers().contentType();
+                            if(!optionalMediaType.isPresent()){
+                                log.debug("[ResponseLogFilter]Response ContentType Is Not Exist");
+                                return Mono.defer(()-> bodyInserter.insert(outputMessage, new BodyInserterContext())
+                                        .then(Mono.defer(() -> {
+                                            Flux<DataBuffer> messageBody = cachedFlux;
+                                            HttpHeaders headers = getDelegate().getHeaders();
+                                            if (!headers.containsKey(HttpHeaders.TRANSFER_ENCODING)) {
+                                                messageBody = messageBody.doOnNext(data -> headers.setContentLength(data.readableByteCount()));
+                                            }
+                                            return getDelegate().writeWith(messageBody);
+                                        })));
+                            }
+                            MediaType contentType = optionalMediaType.get();
                             if(!contentType.equals(MediaType.APPLICATION_JSON) && !contentType.equals(MediaType.APPLICATION_JSON_UTF8)){
                                 log.debug("[ResponseLogFilter]Response ContentType Is Not APPLICATION_JSON Or APPLICATION_JSON_UTF8");
                                 return Mono.defer(()-> bodyInserter.insert(outputMessage, new BodyInserterContext())
