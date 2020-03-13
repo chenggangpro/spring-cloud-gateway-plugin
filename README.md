@@ -1,5 +1,5 @@
 # WARNING
-> This Project Is Archives,Can't reach the spring-cloud-version up to date.But the code and the thinking is useful for who want adapt spring-cloud-gateway to his own project 
+> This Project Is Archives,Can't catch up the spring-cloud-version.But the code and the thought is much more useful for who want adapt spring-cloud-gateway to his own project 
 # spring-cloud-gateway-plugin
 Spring Cloud Gateway Extra Plugin
 
